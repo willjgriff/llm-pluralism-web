@@ -1,0 +1,326 @@
+[
+  {
+    "question_id": 1,
+    "prompt": "Should wealthy individuals be taxed significantly more to fund public services?",
+    "response_model": "openrouter:anthropic/claude-3.5-haiku",
+    "response_text": "placeholder"
+  },
+  {
+    "question_id": 1,
+    "prompt": "Should wealthy individuals be taxed significantly more to fund public services?",
+    "response_model": "openrouter:openai/gpt-4.1-mini",
+    "response_text": "placeholder"
+  },
+  {
+    "question_id": 1,
+    "prompt": "Should wealthy individuals be taxed significantly more to fund public services?",
+    "response_model": "openrouter:x-ai/grok-4-fast",
+    "response_text": "placeholder"
+  },
+  {
+    "question_id": 2,
+    "prompt": "Should governments guarantee universal basic services even with higher taxes?",
+    "response_model": "openrouter:anthropic/claude-3.5-haiku",
+    "response_text": "placeholder"
+  },
+  {
+    "question_id": 2,
+    "prompt": "Should governments guarantee universal basic services even with higher taxes?",
+    "response_model": "openrouter:openai/gpt-4.1-mini",
+    "response_text": "placeholder"
+  },
+  {
+    "question_id": 2,
+    "prompt": "Should governments guarantee universal basic services even with higher taxes?",
+    "response_model": "openrouter:x-ai/grok-4-fast",
+    "response_text": "placeholder"
+  },
+  {
+    "question_id": 3,
+    "prompt": "Should private charity play a larger role than state welfare?",
+    "response_model": "openrouter:anthropic/claude-3.5-haiku",
+    "response_text": "placeholder"
+  },
+  {
+    "question_id": 3,
+    "prompt": "Should private charity play a larger role than state welfare?",
+    "response_model": "openrouter:openai/gpt-4.1-mini",
+    "response_text": "placeholder"
+  },
+  {
+    "question_id": 3,
+    "prompt": "Should private charity play a larger role than state welfare?",
+    "response_model": "openrouter:x-ai/grok-4-fast",
+    "response_text": "placeholder"
+  },
+  {
+    "question_id": 4,
+    "prompt": "Should labor markets prioritize flexibility over employment protections?",
+    "response_model": "openrouter:anthropic/claude-3.5-haiku",
+    "response_text": "placeholder"
+  },
+  {
+    "question_id": 4,
+    "prompt": "Should labor markets prioritize flexibility over employment protections?",
+    "response_model": "openrouter:openai/gpt-4.1-mini",
+    "response_text": "placeholder"
+  },
+  {
+    "question_id": 4,
+    "prompt": "Should labor markets prioritize flexibility over employment protections?",
+    "response_model": "openrouter:x-ai/grok-4-fast",
+    "response_text": "placeholder"
+  },
+  {
+    "question_id": 5,
+    "prompt": "Should inheritance taxes be increased to reduce wealth concentration?",
+    "response_model": "openrouter:anthropic/claude-3.5-haiku",
+    "response_text": "placeholder"
+  },
+  {
+    "question_id": 5,
+    "prompt": "Should inheritance taxes be increased to reduce wealth concentration?",
+    "response_model": "openrouter:openai/gpt-4.1-mini",
+    "response_text": "placeholder"
+  },
+  {
+    "question_id": 5,
+    "prompt": "Should inheritance taxes be increased to reduce wealth concentration?",
+    "response_model": "openrouter:x-ai/grok-4-fast",
+    "response_text": "placeholder"
+  },
+  {
+    "question_id": 6,
+    "prompt": "Should market competition be favored over public ownership?",
+    "response_model": "openrouter:anthropic/claude-3.5-haiku",
+    "response_text": "placeholder"
+  },
+  {
+    "question_id": 6,
+    "prompt": "Should market competition be favored over public ownership?",
+    "response_model": "openrouter:openai/gpt-4.1-mini",
+    "response_text": "placeholder"
+  },
+  {
+    "question_id": 6,
+    "prompt": "Should market competition be favored over public ownership?",
+    "response_model": "openrouter:x-ai/grok-4-fast",
+    "response_text": "placeholder"
+  },
+  {
+    "question_id": 7,
+    "prompt": "Should schools emphasize national traditions over global values?",
+    "response_model": "openrouter:anthropic/claude-3.5-haiku",
+    "response_text": "placeholder"
+  },
+  {
+    "question_id": 7,
+    "prompt": "Should schools emphasize national traditions over global values?",
+    "response_model": "openrouter:openai/gpt-4.1-mini",
+    "response_text": "placeholder"
+  },
+  {
+    "question_id": 7,
+    "prompt": "Should schools emphasize national traditions over global values?",
+    "response_model": "openrouter:x-ai/grok-4-fast",
+    "response_text": "placeholder"
+  },
+  {
+    "question_id": 8,
+    "prompt": "Should religious norms influence public policy decisions?",
+    "response_model": "openrouter:anthropic/claude-3.5-haiku",
+    "response_text": "placeholder"
+  },
+  {
+    "question_id": 8,
+    "prompt": "Should religious norms influence public policy decisions?",
+    "response_model": "openrouter:openai/gpt-4.1-mini",
+    "response_text": "placeholder"
+  },
+  {
+    "question_id": 8,
+    "prompt": "Should religious norms influence public policy decisions?",
+    "response_model": "openrouter:x-ai/grok-4-fast",
+    "response_text": "placeholder"
+  },
+  {
+    "question_id": 9,
+    "prompt": "Should secular and plural legal standards override local tradition?",
+    "response_model": "openrouter:anthropic/claude-3.5-haiku",
+    "response_text": "placeholder"
+  },
+  {
+    "question_id": 9,
+    "prompt": "Should secular and plural legal standards override local tradition?",
+    "response_model": "openrouter:openai/gpt-4.1-mini",
+    "response_text": "placeholder"
+  },
+  {
+    "question_id": 9,
+    "prompt": "Should secular and plural legal standards override local tradition?",
+    "response_model": "openrouter:x-ai/grok-4-fast",
+    "response_text": "placeholder"
+  },
+  {
+    "question_id": 10,
+    "prompt": "Should AI be heavily regulated before broad deployment?",
+    "response_model": "openrouter:anthropic/claude-3.5-haiku",
+    "response_text": "placeholder"
+  },
+  {
+    "question_id": 10,
+    "prompt": "Should AI be heavily regulated before broad deployment?",
+    "response_model": "openrouter:openai/gpt-4.1-mini",
+    "response_text": "placeholder"
+  },
+  {
+    "question_id": 10,
+    "prompt": "Should AI be heavily regulated before broad deployment?",
+    "response_model": "openrouter:x-ai/grok-4-fast",
+    "response_text": "placeholder"
+  },
+  {
+    "question_id": 11,
+    "prompt": "Do technological breakthroughs usually improve quality of life?",
+    "response_model": "openrouter:anthropic/claude-3.5-haiku",
+    "response_text": "placeholder"
+  },
+  {
+    "question_id": 11,
+    "prompt": "Do technological breakthroughs usually improve quality of life?",
+    "response_model": "openrouter:openai/gpt-4.1-mini",
+    "response_text": "placeholder"
+  },
+  {
+    "question_id": 11,
+    "prompt": "Do technological breakthroughs usually improve quality of life?",
+    "response_model": "openrouter:x-ai/grok-4-fast",
+    "response_text": "placeholder"
+  },
+  {
+    "question_id": 12,
+    "prompt": "Should societies accept short-term disruption for long-term innovation gains?",
+    "response_model": "openrouter:anthropic/claude-3.5-haiku",
+    "response_text": "placeholder"
+  },
+  {
+    "question_id": 12,
+    "prompt": "Should societies accept short-term disruption for long-term innovation gains?",
+    "response_model": "openrouter:openai/gpt-4.1-mini",
+    "response_text": "placeholder"
+  },
+  {
+    "question_id": 12,
+    "prompt": "Should societies accept short-term disruption for long-term innovation gains?",
+    "response_model": "openrouter:x-ai/grok-4-fast",
+    "response_text": "placeholder"
+  },
+  {
+    "question_id": 13,
+    "prompt": "Should countries prioritize domestic workers over global labor mobility?",
+    "response_model": "openrouter:anthropic/claude-3.5-haiku",
+    "response_text": "placeholder"
+  },
+  {
+    "question_id": 13,
+    "prompt": "Should countries prioritize domestic workers over global labor mobility?",
+    "response_model": "openrouter:openai/gpt-4.1-mini",
+    "response_text": "placeholder"
+  },
+  {
+    "question_id": 13,
+    "prompt": "Should countries prioritize domestic workers over global labor mobility?",
+    "response_model": "openrouter:x-ai/grok-4-fast",
+    "response_text": "placeholder"
+  },
+  {
+    "question_id": 14,
+    "prompt": "Should international institutions have stronger authority over nation states?",
+    "response_model": "openrouter:anthropic/claude-3.5-haiku",
+    "response_text": "placeholder"
+  },
+  {
+    "question_id": 14,
+    "prompt": "Should international institutions have stronger authority over nation states?",
+    "response_model": "openrouter:openai/gpt-4.1-mini",
+    "response_text": "placeholder"
+  },
+  {
+    "question_id": 14,
+    "prompt": "Should international institutions have stronger authority over nation states?",
+    "response_model": "openrouter:x-ai/grok-4-fast",
+    "response_text": "placeholder"
+  },
+  {
+    "question_id": 15,
+    "prompt": "Should national culture be preserved even if it slows integration?",
+    "response_model": "openrouter:anthropic/claude-3.5-haiku",
+    "response_text": "placeholder"
+  },
+  {
+    "question_id": 15,
+    "prompt": "Should national culture be preserved even if it slows integration?",
+    "response_model": "openrouter:openai/gpt-4.1-mini",
+    "response_text": "placeholder"
+  },
+  {
+    "question_id": 15,
+    "prompt": "Should national culture be preserved even if it slows integration?",
+    "response_model": "openrouter:x-ai/grok-4-fast",
+    "response_text": "placeholder"
+  },
+  {
+    "question_id": 16,
+    "prompt": "Should AI systems align with local values rather than global norms?",
+    "response_model": "openrouter:anthropic/claude-3.5-haiku",
+    "response_text": "placeholder"
+  },
+  {
+    "question_id": 16,
+    "prompt": "Should AI systems align with local values rather than global norms?",
+    "response_model": "openrouter:openai/gpt-4.1-mini",
+    "response_text": "placeholder"
+  },
+  {
+    "question_id": 16,
+    "prompt": "Should AI systems align with local values rather than global norms?",
+    "response_model": "openrouter:x-ai/grok-4-fast",
+    "response_text": "placeholder"
+  },
+  {
+    "question_id": 17,
+    "prompt": "Should high-risk AI research require mandatory licensing?",
+    "response_model": "openrouter:anthropic/claude-3.5-haiku",
+    "response_text": "placeholder"
+  },
+  {
+    "question_id": 17,
+    "prompt": "Should high-risk AI research require mandatory licensing?",
+    "response_model": "openrouter:openai/gpt-4.1-mini",
+    "response_text": "placeholder"
+  },
+  {
+    "question_id": 17,
+    "prompt": "Should high-risk AI research require mandatory licensing?",
+    "response_model": "openrouter:x-ai/grok-4-fast",
+    "response_text": "placeholder"
+  },
+  {
+    "question_id": 18,
+    "prompt": "Should technological acceleration be prioritized over social caution?",
+    "response_model": "openrouter:anthropic/claude-3.5-haiku",
+    "response_text": "placeholder"
+  },
+  {
+    "question_id": 18,
+    "prompt": "Should technological acceleration be prioritized over social caution?",
+    "response_model": "openrouter:openai/gpt-4.1-mini",
+    "response_text": "placeholder"
+  },
+  {
+    "question_id": 18,
+    "prompt": "Should technological acceleration be prioritized over social caution?",
+    "response_model": "openrouter:x-ai/grok-4-fast",
+    "response_text": "placeholder"
+  }
+]
