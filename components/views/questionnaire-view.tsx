@@ -1,0 +1,137 @@
+"use client"
+
+import { useState } from "react"
+import { Button } from "@/components/ui/button"
+
+const questions = [
+  "The government should play a major role in reducing inequality through taxation and public services.",
+  "Individuals should be free to keep the wealth they earn with minimal state redistribution.",
+  "Nations have a primary duty to protect their own citizens before helping people in other countries.",
+  "Open borders and freedom of movement are broadly good for humanity.",
+  "Religious beliefs and institutions should play an active role in public life and policy.",
+  "Public life and policy should be guided by evidence and secular values, not religious belief.",
+  "AI development should be slowed until we better understand the risks.",
+  "The benefits of technological progress strongly outweigh the risks.",
+]
+
+interface QuestionnaireViewProps {
+  onNavigate: (view: string) => void
+}
+
+export function QuestionnaireView({ onNavigate }: QuestionnaireViewProps) {
+  const [answers, setAnswers] = useState<Record<number, number>>({})
+  
+  const answeredCount = Object.keys(answers).length
+  const progress = (answeredCount / questions.length) * 100
+  const allAnswered = answeredCount === questions.length
+
+  const handleSelect = (questionIndex: number, value: number) => {
+    setAnswers(prev => ({ ...prev, [questionIndex]: value }))
+  }
+
+  return (
+    <div className="min-h-screen overflow-y-auto">
+      {/* Progress bar */}
+      <div className="fixed top-0 left-0 right-0 z-50 h-1 bg-[#1a1a24]">
+        <div 
+          className="h-full bg-accent transition-all duration-300 ease-out"
+          style={{ width: `${progress}%` }}
+        />
+      </div>
+      
+      {/* Soft radial gradient glow */}
+      <div 
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          background: "radial-gradient(ellipse 60% 40% at 50% 35%, rgba(94, 170, 168, 0.08) 0%, transparent 70%)"
+        }}
+      />
+      
+      {/* Content */}
+      <div className="relative z-10 w-full max-w-[580px] mx-auto px-6 py-20">
+        {/* Badge */}
+        <div className="text-center mb-8">
+          <span className="inline-flex px-3 py-1 text-xs font-medium tracking-wide uppercase text-accent bg-accent/10 border border-accent/20 rounded-full">
+            Your Values
+          </span>
+        </div>
+
+        {/* Header */}
+        <div className="text-center mb-10">
+          <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-white mb-4">
+            Tell us about your perspective
+          </h1>
+          <p className="text-base text-[#a0a0a8] font-normal leading-relaxed">
+            There are no right or wrong answers. We use your responses to personalise your experience.
+          </p>
+        </div>
+
+        {/* Questions */}
+        <div className="space-y-4">
+          {questions.map((question, index) => (
+            <QuestionCard
+              key={index}
+              question={question}
+              questionIndex={index}
+              selectedValue={answers[index]}
+              onSelect={handleSelect}
+            />
+          ))}
+        </div>
+
+        {/* Continue button */}
+        <div className="mt-10 text-center">
+          <Button 
+            size="lg"
+            disabled={!allAnswered}
+            onClick={() => allAnswered && onNavigate("profile")}
+            className="px-10 py-6 text-base font-medium bg-accent text-accent-foreground hover:bg-accent/90 transition-all duration-200 shadow-lg shadow-accent/25 disabled:opacity-40 disabled:shadow-none disabled:cursor-not-allowed"
+          >
+            Continue
+          </Button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+interface QuestionCardProps {
+  question: string
+  questionIndex: number
+  selectedValue: number | undefined
+  onSelect: (questionIndex: number, value: number) => void
+}
+
+function QuestionCard({ question, questionIndex, selectedValue, onSelect }: QuestionCardProps) {
+  return (
+    <div className="p-5 bg-[#0f0f18] border border-[#1a1a24] rounded-xl">
+      <p className="text-[15px] text-white mb-5 leading-relaxed">
+        {question}
+      </p>
+      
+      <div className="flex flex-col gap-3">
+        <div className="flex items-center justify-center gap-3 sm:gap-4">
+          {[1, 2, 3, 4, 5].map((value) => (
+            <button
+              key={value}
+              onClick={() => onSelect(questionIndex, value)}
+              className={`
+                w-6 h-6 rounded-full border-2 transition-all duration-200
+                ${selectedValue === value 
+                  ? "bg-accent border-accent shadow-[0_0_12px_rgba(94,170,168,0.5)]" 
+                  : "border-[#3a3a48] hover:border-accent/50 hover:shadow-[0_0_8px_rgba(94,170,168,0.25)]"
+                }
+              `}
+              aria-label={`Rate ${value} out of 5`}
+            />
+          ))}
+        </div>
+        
+        <div className="flex justify-between">
+          <span className="text-sm text-[#707078]">Strongly Disagree</span>
+          <span className="text-sm text-[#707078]">Strongly Agree</span>
+        </div>
+      </div>
+    </div>
+  )
+}
