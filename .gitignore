@@ -14,3 +14,19 @@ next.user-config.*
 node_modules
 .next/
 .DS_Store
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+*.db
+
+# TypeScript
+*.tsbuildinfo
+
+# UV
+uv.lock
+
+# Environment
+.env
+.env.local

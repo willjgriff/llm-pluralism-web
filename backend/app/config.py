@@ -1,0 +1,7 @@
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
+DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./pluralism.db")
+FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:3000")

@@ -8,10 +8,10 @@ const questions = [
   "Individuals should be free to keep the wealth they earn with minimal state redistribution.",
   "Nations have a primary duty to protect their own citizens before helping people in other countries.",
   "Open borders and freedom of movement are broadly good for humanity.",
-  "Religious beliefs and institutions should play an active role in public life and policy.",
-  "Public life and policy should be guided by evidence and secular values, not religious belief.",
   "AI development should be slowed until we better understand the risks.",
   "The benefits of technological progress strongly outweigh the risks.",
+  "Religious beliefs and institutions should play an active role in public life and policy.",
+  "Public life and policy should be guided by evidence and secular values, not religious belief.",
 ]
 
 interface QuestionnaireViewProps {
