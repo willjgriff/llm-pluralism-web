@@ -5,6 +5,19 @@ import { ValueSliders } from "@/components/value-sliders"
 import { BarChart, Bar, XAxis, YAxis, Cell, ResponsiveContainer, LabelList } from "recharts"
 import { PersonaProfile, Results } from "@/lib/types"
 
+const TEAL = "rgb(94, 170, 168)"
+const TEAL_DARK = "rgb(55, 100, 98)"
+const WHITE_90 = "rgba(255, 255, 255, 0.90)"
+const WHITE_60 = "rgba(255, 255, 255, 0.6)"
+const WHITE_55 = "rgba(255, 255, 255, 0.55)"
+const WHITE_50 = "rgba(255, 255, 255, 0.5)"
+const WHITE_45 = "rgba(255, 255, 255, 0.45)"
+const WHITE_40 = "rgba(255, 255, 255, 0.4)"
+const WHITE_20 = "rgba(255, 255, 255, 0.2)"
+const WHITE_10 = "rgba(255, 255, 255, 0.1)"
+const WHITE_05 = "rgba(255, 255, 255, 0.05)"
+const WHITE_03 = "rgba(255, 255, 255, 0.03)"
+
 interface ResultsViewProps {
   results: Results
   personaProfile: PersonaProfile
@@ -17,16 +30,37 @@ const MODEL_LABS: Record<string, string> = {
   "openrouter:x-ai/grok-4-fast": "by xAI",
 }
 
-const getBarColor = (type: string) => {
-  switch (type) {
-    case "user": return "rgb(94, 170, 168)" // teal
-    case "userPersona": 
-    case "personaAvg": return "rgb(55, 100, 98)" // dark teal
-    case "overall":
-    case "other": return "rgba(255, 255, 255, 0.2)" // dark grey
-    default: return "rgba(255, 255, 255, 0.2)"
-  }
+/** Prefix for bar row `id` so `LabelList` content still sees it after Recharts `filterProps` strips `payload` / `type`. */
+const AGGREGATE_UNAVAILABLE_ID_PREFIX = "llm-pluralism-aggregate-unavailable"
+
+function resultsChartLabelContent(props: any) {
+  const { x = 0, y = 0, width = 0, height = 0, value, id = "" } = props
+  const label = String(id).startsWith(AGGREGATE_UNAVAILABLE_ID_PREFIX)
+    ? "Not yet evaluated"
+    : value
+  if (label === undefined || label === null) return null
+  return (
+    <text
+      x={Number(x) + Number(width) + 5}
+      y={Number(y) + Number(height) / 2}
+      fill={WHITE_60}
+      fontSize={11}
+      dominantBaseline="middle"
+      textAnchor="start"
+    >
+      {label}
+    </text>
+  )
 }
+
+const getBarColor = (type: string) => ({
+  user: TEAL,
+  userPersona: TEAL_DARK,
+  personaAvg: TEAL_DARK,
+  unavailable: WHITE_05,
+  overall: WHITE_20,
+  other: WHITE_20,
+}[type] ?? WHITE_20)
 
 export function ResultsView({ results, personaProfile, onReset }: ResultsViewProps) {
   const [copied, setCopied] = useState(false)
@@ -44,32 +78,45 @@ export function ResultsView({ results, personaProfile, onReset }: ResultsViewPro
     ? Math.round((results.aggregate_by_persona.reduce((sum, p) => sum + p.mean_score, 0) / results.aggregate_by_persona.length) * 10) / 10
     : 0
 
+  const isCentrist = personaProfile.primaryPersona === "Centrist"
+
   const collapsedChartData = [
     { persona: "You", score: userMeanScore, type: "user" },
-    { persona: `${personaProfile.primaryPersona} avg`, score: personaAvgScore, type: "personaAvg" },
+    isCentrist && personaAvgScore === 0
+      ? { id: `${AGGREGATE_UNAVAILABLE_ID_PREFIX}-collapsed`, persona: "Centrist avg", score: 0, type: "unavailable" }
+      : { persona: `${personaProfile.primaryPersona} avg`, score: personaAvgScore, type: "personaAvg" },
     { persona: "Overall avg", score: overallAvgScore, type: "overall" },
   ]
 
   const expandedChartData = [
     { persona: "You", score: userMeanScore, type: "user" },
-    ...results.aggregate_by_persona.map(p => ({
-      persona: p.persona,
-      score: p.mean_score,
-      type: p.persona === personaProfile.primaryPersona ? "userPersona" : "other",
-    })),
+    ...results.aggregate_by_persona.map((p, i) => {
+      const isUnavailable = isCentrist && p.persona === "Centrist" && p.mean_score === 0
+      return {
+        ...(isUnavailable ? { id: `${AGGREGATE_UNAVAILABLE_ID_PREFIX}-expanded-${i}` } : {}),
+        persona: p.persona,
+        score: p.mean_score,
+        type: isUnavailable ? "unavailable" : p.persona === personaProfile.primaryPersona ? "userPersona" : "other",
+      }
+    }),
+    ...(isCentrist && !results.aggregate_by_persona.some(p => p.persona === "Centrist")
+      ? [{ id: `${AGGREGATE_UNAVAILABLE_ID_PREFIX}-expanded-appended`, persona: "Centrist", score: 0, type: "unavailable" }]
+      : []),
   ]
   
   const chartData = chartExpanded ? expandedChartData : collapsedChartData
   const chartHeight = chartExpanded ? 360 : 140
 
   const handleCopyToClipboard = () => {
+    const personas = [personaProfile.economic, personaProfile.identity, personaProfile.technology, personaProfile.society]
+      .filter(p => p !== "Neutral")
+      .join(" · ")
     const shareText = `LLM PLURALISM EVALUATION
-Libertarian · Globalist · Tech Sceptic · Secularist
-My AI match: Claude 3.5 Haiku
-Rated AI responses 3.4/5 for reasonableness
+${personas}
+My AI match: ${results.best_match.model_display_name}
+Rated AI responses ${userMeanScore}/5 for reasonableness
 Find out which AI model actually understands your worldview:
 llm-pluralism.vercel.app`
-    
     navigator.clipboard.writeText(shareText)
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
@@ -91,7 +138,7 @@ llm-pluralism.vercel.app`
               className="px-3 py-1 text-xs font-medium tracking-wider rounded-full"
               style={{ 
                 backgroundColor: "rgba(94, 170, 168, 0.15)",
-                color: "rgb(94, 170, 168)"
+                color: TEAL
               }}
             >
               YOUR RESULTS
@@ -109,13 +156,13 @@ llm-pluralism.vercel.app`
           <div 
             className="rounded-xl p-6 mb-4"
             style={{ 
-              backgroundColor: "rgba(255, 255, 255, 0.03)",
+              backgroundColor: WHITE_03,
               border: "1px solid rgba(45, 212, 191, 0.3)"
             }}
           >
             <p 
               className="text-xs uppercase tracking-wider mb-2"
-              style={{ color: "rgba(255, 255, 255, 0.4)" }}
+              style={{ color: WHITE_40 }}
             >
               BEST MATCH
             </p>
@@ -127,13 +174,13 @@ llm-pluralism.vercel.app`
             </p>
             <p 
               className="text-sm mt-1"
-              style={{ color: "rgba(255, 255, 255, 0.5)" }}
+              style={{ color: WHITE_50 }}
             >
               {MODEL_LABS[results.best_match.model] ?? ""}
             </p>
             <p 
               className="text-sm mt-3"
-              style={{ color: "rgba(255, 255, 255, 0.6)" }}
+              style={{ color: WHITE_60 }}
             >
               {results.best_match.model_display_name} produced the responses you rated most reasonable across your session.
             </p>
@@ -142,7 +189,7 @@ llm-pluralism.vercel.app`
           {/* Label above model cards */}
           <p 
             className="text-xs uppercase tracking-wider text-center mb-4"
-            style={{ color: "rgba(255, 255, 255, 0.4)" }}
+            style={{ color: WHITE_40 }}
           >
             Models you rated
           </p>
@@ -154,28 +201,28 @@ llm-pluralism.vercel.app`
                 key={model.model}
                 className="rounded-xl p-4"
                 style={{ 
-                  backgroundColor: "rgba(255, 255, 255, 0.03)",
+                  backgroundColor: WHITE_03,
                   border: model.model === results.best_match.model
                     ? "1px solid rgba(45, 212, 191, 0.3)" 
-                    : "1px solid rgba(255, 255, 255, 0.1)"
+                    : `1px solid ${WHITE_10}`
                 }}
               >
                 <p 
                   className="text-sm font-medium mb-2"
-                  style={{ color: "rgba(255, 255, 255, 0.9)" }}
+                  style={{ color: WHITE_90 }}
                 >
                   {model.model_display_name}
                 </p>
                 <div className="flex items-baseline gap-1 mb-2">
                   <span 
                     className="text-2xl font-bold"
-                    style={{ color: "rgb(94, 170, 168)" }}
+                    style={{ color: TEAL }}
                   >
                     {model.mean_score}
                   </span>
                   <span 
                     className="text-xs"
-                    style={{ color: "rgba(255, 255, 255, 0.4)" }}
+                    style={{ color: WHITE_40 }}
                   >
                     / 5 avg
                   </span>
@@ -183,13 +230,13 @@ llm-pluralism.vercel.app`
                 {/* Score bar */}
                 <div 
                   className="h-1 w-full rounded-full"
-                  style={{ backgroundColor: "rgba(255, 255, 255, 0.1)" }}
+                  style={{ backgroundColor: WHITE_10 }}
                 >
                   <div 
                     className="h-full rounded-full"
                     style={{ 
                       width: `${(model.mean_score / 5) * 100}%`,
-                      backgroundColor: "rgb(94, 170, 168)"
+                      backgroundColor: TEAL
                     }}
                   />
                 </div>
@@ -199,7 +246,7 @@ llm-pluralism.vercel.app`
 
           <p 
             className="text-center text-sm mx-auto"
-            style={{ color: "rgba(255, 255, 255, 0.4)", maxWidth: "560px" }}
+            style={{ color: WHITE_40, maxWidth: "560px" }}
           >
             These are not the latest versions from each organisation, but research suggests value alignment patterns are consistent across model generations — your match is likely to reflect your experience with newer versions too.
           </p>
@@ -211,12 +258,12 @@ llm-pluralism.vercel.app`
             className="text-2xl font-bold text-center mb-3"
             style={{ color: "rgba(255, 255, 255, 0.95)" }}
           >
-            Your primary value dimension is <span style={{ color: "rgb(94, 170, 168)" }}>{personaProfile.primaryPersona}</span>
+            Your primary value dimension is <span style={{ color: TEAL }}>{personaProfile.primaryPersona}</span>
           </h2>
 
           <p 
             className="text-center mb-10"
-            style={{ color: "rgba(255, 255, 255, 0.55)" }}
+            style={{ color: WHITE_55 }}
           >
             Here&apos;s how your values map across all four dimensions
           </p>
@@ -255,7 +302,7 @@ llm-pluralism.vercel.app`
                   axisLine={false}
                   tickLine={false}
                   tick={{ 
-                    fill: "rgba(255, 255, 255, 0.6)", 
+                    fill: WHITE_60, 
                     fontSize: 12 
                   }}
                   width={110}
@@ -264,6 +311,7 @@ llm-pluralism.vercel.app`
                   dataKey="score" 
                   radius={[0, 4, 4, 0]}
                   barSize={20}
+                  minPointSize={4}
                 >
                   {chartData.map((entry, index) => (
                     <Cell 
@@ -274,10 +322,7 @@ llm-pluralism.vercel.app`
                   <LabelList 
                     dataKey="score" 
                     position="right" 
-                    style={{ 
-                      fill: "rgba(255, 255, 255, 0.6)", 
-                      fontSize: 11 
-                    }}
+                    content={resultsChartLabelContent}
                   />
                 </Bar>
               </BarChart>
@@ -288,16 +333,16 @@ llm-pluralism.vercel.app`
           {chartExpanded && (
             <div className="flex justify-center gap-6 mb-4">
               <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: "rgb(94, 170, 168)" }} />
-                <span className="text-xs" style={{ color: "rgba(255, 255, 255, 0.5)" }}>You</span>
+                <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: TEAL }} />
+                <span className="text-xs" style={{ color: WHITE_50 }}>You</span>
               </div>
               <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: "rgb(55, 100, 98)" }} />
-                <span className="text-xs" style={{ color: "rgba(255, 255, 255, 0.5)" }}>Your persona</span>
+                <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: TEAL_DARK }} />
+                <span className="text-xs" style={{ color: WHITE_50 }}>Your persona</span>
               </div>
               <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: "rgba(255, 255, 255, 0.2)" }} />
-                <span className="text-xs" style={{ color: "rgba(255, 255, 255, 0.5)" }}>Other groups</span>
+                <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: WHITE_20 }} />
+                <span className="text-xs" style={{ color: WHITE_50 }}>Other groups</span>
               </div>
             </div>
           )}
@@ -309,8 +354,8 @@ llm-pluralism.vercel.app`
               className="px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200"
               style={{ 
                 backgroundColor: "transparent",
-                color: "rgb(94, 170, 168)",
-                border: "1px solid rgb(94, 170, 168)"
+                color: TEAL,
+                border: `1px solid ${TEAL}`
               }}
             >
               {chartExpanded ? "Show less ▲" : "See how all groups compare ▼"}
@@ -320,7 +365,7 @@ llm-pluralism.vercel.app`
           {/* Dynamic callout text */}
           <p 
             className="text-sm mb-2"
-            style={{ color: "rgba(255, 255, 255, 0.6)" }}
+            style={{ color: WHITE_60 }}
           >
             {chartExpanded 
               ? "Globalists rate AI highest, Religious personas lowest. People with different values rate AI responses very differently — a pattern consistent across our full evaluation dataset."
@@ -329,7 +374,7 @@ llm-pluralism.vercel.app`
           </p>
           <p 
             className="text-sm"
-            style={{ color: "rgba(255, 255, 255, 0.4)" }}
+            style={{ color: WHITE_40 }}
           >
             {results.use_live_data
               ? "Chart shows live data from real participants."
@@ -357,13 +402,13 @@ llm-pluralism.vercel.app`
           >
             <p 
               className="text-xs uppercase tracking-wider"
-              style={{ color: "rgba(255, 255, 255, 0.4)" }}
+              style={{ color: WHITE_40 }}
             >
               LLM PLURALISM EVALUATION
             </p>
             <p 
               className="text-sm font-medium mt-1"
-              style={{ color: "rgba(255, 255, 255, 0.9)" }}
+              style={{ color: WHITE_90 }}
             >
               {[personaProfile.economic, personaProfile.identity, personaProfile.technology, personaProfile.society]
                 .filter(p => p !== 'Neutral')
@@ -377,19 +422,19 @@ llm-pluralism.vercel.app`
             </p>
             <p 
               className="text-sm"
-              style={{ color: "rgba(255, 255, 255, 0.6)" }}
+              style={{ color: WHITE_60 }}
             >
               Rated AI responses {userMeanScore}/5 for reasonableness
             </p>
             <p 
               className="text-sm mt-2"
-              style={{ color: "rgba(255, 255, 255, 0.9)" }}
+              style={{ color: WHITE_90 }}
             >
               Find out which AI model actually understands your worldview:
             </p>
             <p 
               className="text-xs mt-1"
-              style={{ color: "rgba(255, 255, 255, 0.4)" }}
+              style={{ color: WHITE_40 }}
             >
               llm-pluralism.vercel.app
             </p>
@@ -402,8 +447,8 @@ llm-pluralism.vercel.app`
               className="px-6 py-2.5 rounded-lg font-medium text-sm transition-all duration-200"
               style={{ 
                 backgroundColor: "transparent",
-                color: "rgb(94, 170, 168)",
-                border: "1px solid rgb(94, 170, 168)"
+                color: TEAL,
+                border: `1px solid ${TEAL}`
               }}
             >
               {copied ? "Copied ✓" : "Copy to clipboard"}
@@ -413,13 +458,13 @@ llm-pluralism.vercel.app`
           {/* Divider */}
           <div 
             className="w-full h-px mb-8"
-            style={{ backgroundColor: "rgba(255, 255, 255, 0.1)" }}
+            style={{ backgroundColor: WHITE_10 }}
           />
 
           {/* Research credit */}
           <p 
             className="text-sm text-center mb-3"
-            style={{ color: "rgba(255, 255, 255, 0.6)" }}
+            style={{ color: WHITE_60 }}
           >
             Curious about the methodology? This is part of an ongoing AI safety research project exploring pluralistic alignment in frontier LLMs.
           </p>
@@ -430,7 +475,7 @@ llm-pluralism.vercel.app`
               target="_blank" 
               rel="noopener noreferrer"
               className="text-sm font-medium transition-opacity hover:opacity-80"
-              style={{ color: "rgb(94, 170, 168)" }}
+              style={{ color: TEAL }}
             >
               View Research on GitHub →
             </a>
@@ -440,7 +485,7 @@ llm-pluralism.vercel.app`
             <button
               onClick={handleStartOver}
               className="text-sm transition-opacity hover:opacity-80"
-              style={{ color: "rgba(255, 255, 255, 0.4)" }}
+              style={{ color: WHITE_40 }}
             >
               Take the survey again
             </button>

@@ -3,6 +3,13 @@ from sqlalchemy.orm import Session as DBSession
 from sqlalchemy import func
 from app.database import get_db
 from app.models.database import Rating, Session
+from pathlib import Path
+import json
+
+PERSONA_SCORES_PATH = Path(__file__).parent.parent / "data" / "persona_score_means.json"
+
+with open(PERSONA_SCORES_PATH) as f:
+    STATIC_PERSONA_DATA = json.load(f)
 
 router = APIRouter()
 
@@ -11,18 +18,6 @@ MODEL_DISPLAY_NAMES = {
     "openai:gpt-4.1-mini": "GPT-4.1 Mini",
     "openrouter:x-ai/grok-4-fast": "Grok 4 Fast",
 }
-
-STATIC_PERSONA_DATA = [
-    {"persona": "Libertarian", "mean_score": 2.19, "participant_count": 0},
-    {"persona": "Collectivist", "mean_score": 3.45, "participant_count": 0},
-    {"persona": "Nationalist", "mean_score": 2.89, "participant_count": 0},
-    {"persona": "Globalist", "mean_score": 3.67, "participant_count": 0},
-    {"persona": "Tech Optimist", "mean_score": 3.21, "participant_count": 0},
-    {"persona": "Tech Sceptic", "mean_score": 2.76, "participant_count": 0},
-    {"persona": "Religious", "mean_score": 2.54, "participant_count": 0},
-    {"persona": "Secularist", "mean_score": 3.38, "participant_count": 0},
-    {"persona": "Centrist", "mean_score": 3.02, "participant_count": 0},
-]
 
 @router.get("/results/{session_id}")
 def get_results(session_id: str, db: DBSession = Depends(get_db)):
@@ -76,7 +71,10 @@ def get_results(session_id: str, db: DBSession = Depends(get_db)):
             for row in live_data
         ]
     else:
-        aggregate_by_persona = STATIC_PERSONA_DATA
+        aggregate_by_persona = [
+            {**entry, "participant_count": 0}
+            for entry in STATIC_PERSONA_DATA
+        ]
 
     return {
         "session_id": session_id,
