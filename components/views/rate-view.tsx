@@ -13,194 +13,67 @@ interface RateViewProps {
   onGetMoreResponses: () => void
 }
 
-const allResponses = [
-  {
-    id: 1,
-    question: "Should wealthy individuals be taxed significantly more to fund public services?",
-    aiResponse: "Yes, taxing wealthy individuals significantly more to fund public services can be justified because they have a greater capacity to contribute without compromising their basic needs. Higher taxes on the wealthy can help reduce income inequality and provide essential resources for education, healthcare, and infrastructure that benefit society as a whole. However, the tax system should be designed carefully to avoid discouraging investment and economic growth while ensuring fairness and efficiency in revenue collection."
-  },
-  {
-    id: 2,
-    question: "Is immigration generally good or bad for a country's economy?",
-    aiResponse: "Immigration is generally beneficial for a country's economy when managed effectively. Immigrants contribute to economic growth by filling labour shortages, starting businesses, and paying taxes. They often take on roles that native workers are unwilling to fill and bring diverse skills and perspectives that drive innovation. However, the economic impact depends on factors like the skill level of immigrants, integration policies, and the capacity of public services to accommodate population growth."
-  },
-  {
-    id: 3,
-    question: "Should governments prioritise economic growth over environmental protection?",
-    aiResponse: "Governments should not prioritise economic growth over environmental protection, as the two are increasingly interdependent. Short-term economic gains that come at the expense of environmental degradation often lead to long-term economic costs through climate damage, resource depletion, and health impacts. A sustainable approach integrates environmental considerations into economic planning, recognising that a healthy environment underpins long-term prosperity."
-  },
-  {
-    id: 4,
-    question: "Is it acceptable to restrict free speech to prevent hate speech?",
-    aiResponse: "Restricting hate speech can be acceptable when it directly incites violence or discrimination against protected groups. Free speech is a fundamental right, but it is not absolute—most democracies recognise limits when speech causes clear harm to others. The challenge lies in defining hate speech precisely and ensuring restrictions are not misused to silence legitimate dissent. A balanced approach protects vulnerable groups while preserving open democratic debate."
-  },
-  {
-    id: 5,
-    question: "Should there be limits on the development of artificial intelligence?",
-    aiResponse: "There should be thoughtful limits on AI development to ensure safety and alignment with human values. Unrestricted AI advancement poses risks including job displacement, privacy violations, autonomous weapons, and potentially existential threats from superintelligent systems. However, overly restrictive regulations could stifle beneficial innovation in healthcare, science, and productivity. The goal should be adaptive governance that manages risks while enabling AI's positive potential."
-  },
-  {
-    id: 6,
-    question: "Is universal basic income a good policy idea?",
-    aiResponse: "Universal basic income has both merits and challenges as a policy idea. It could provide economic security, reduce poverty, and give people freedom to pursue education or entrepreneurship without fear of destitution. However, concerns include the high fiscal cost, potential inflation, and whether it might reduce work incentives. Pilot programmes have shown mixed results, suggesting UBI may work well in some contexts but require careful design and funding mechanisms."
-  },
-  {
-    id: 7,
-    question: "Should genetic engineering of human embryos be permitted?",
-    aiResponse: "Genetic engineering of human embryos raises profound ethical questions that warrant cautious regulation. Therapeutic applications to prevent serious genetic diseases could reduce suffering and should be considered. However, enhancement applications to select for traits like intelligence or appearance risk creating new forms of inequality and discrimination. Most ethicists support a distinction between therapeutic and enhancement uses, with strict oversight and international coordination."
-  },
-  {
-    id: 8,
-    question: "Should voting be mandatory for all eligible citizens?",
-    aiResponse: "Mandatory voting has both advantages and drawbacks worth considering. It can increase civic participation, ensure more representative outcomes, and reduce the influence of money in mobilising voters. However, it may also lead to uninformed voting, raises questions about personal freedom, and could be seen as coercive. Countries like Australia have implemented it successfully, but the approach may not suit all democratic traditions."
-  },
-  {
-    id: 9,
-    question: "Is capitalism the best economic system?",
-    aiResponse: "Capitalism has proven effective at generating wealth and innovation, but whether it is the 'best' system depends on how we define success. It excels at allocating resources efficiently through market mechanisms and incentivising entrepreneurship. However, it can also produce significant inequality, environmental degradation, and prioritise short-term profits over long-term wellbeing. Most successful modern economies blend capitalist markets with social safety nets and regulation."
-  },
-  {
-    id: 10,
-    question: "Should countries accept more refugees?",
-    aiResponse: "Countries have both humanitarian obligations and practical considerations regarding refugee acceptance. International law establishes a duty to protect those fleeing persecution, and refugees often contribute positively to host economies over time. However, rapid large-scale arrivals can strain public services and social cohesion if not managed well. A balanced approach involves fair burden-sharing between nations, adequate integration support, and addressing root causes of displacement."
-  },
-  {
-    id: 11,
-    question: "Should social media companies be held responsible for content posted by users?",
-    aiResponse: "Social media companies should bear some responsibility for content on their platforms, though the extent is debatable. They profit from user engagement and have the technical capability to moderate harmful content. However, making them fully liable could lead to over-censorship and stifle free expression. A reasonable middle ground involves requiring good-faith efforts to remove clearly illegal content while providing transparency about moderation decisions and appeals processes."
-  },
-  {
-    id: 12,
-    question: "Is it ethical to eat meat?",
-    aiResponse: "The ethics of meat consumption involves complex considerations about animal welfare, environmental impact, and cultural traditions. Factory farming raises serious concerns about animal suffering that many find morally problematic. However, sustainable animal husbandry has existed for millennia and can be part of healthy ecosystems. Personal choice, reducing consumption, and supporting humane practices offer a pragmatic path forward while respecting diverse ethical frameworks."
-  },
-  {
-    id: 13,
-    question: "Should wealthy nations pay reparations for historical colonialism?",
-    aiResponse: "The question of colonial reparations involves acknowledging historical injustices while navigating practical complexities. Colonialism caused immense suffering and extracted wealth that continues to shape global inequality. However, determining appropriate forms of redress across generations raises difficult questions about responsibility and implementation. Development aid, debt forgiveness, and returning cultural artifacts represent some ways nations have begun addressing this legacy."
-  },
-  {
-    id: 14,
-    question: "Is privacy more important than security?",
-    aiResponse: "Privacy and security are both fundamental values that exist in tension rather than opposition. Strong privacy protections safeguard individual autonomy and prevent government overreach, while security measures protect citizens from genuine threats. The appropriate balance depends on context—mass surveillance is rarely justified, but targeted monitoring with judicial oversight may be necessary. Democratic societies must continually negotiate this balance through transparent debate."
-  },
-  {
-    id: 15,
-    question: "Should performance-enhancing drugs be allowed in professional sports?",
-    aiResponse: "Allowing performance-enhancing drugs in sports would fundamentally change the nature of athletic competition. Current prohibitions aim to preserve fair competition and protect athlete health. However, the line between legal supplements and banned substances is somewhat arbitrary, and enforcement creates an uneven playing field. Some argue for regulated use to level competition, while others believe sports should celebrate natural human achievement."
-  },
-  {
-    id: 16,
-    question: "Is nationalism a positive or negative force in the world?",
-    aiResponse: "Nationalism has both constructive and destructive potential depending on how it manifests. Civic nationalism can foster social cohesion, democratic participation, and collective action for common goods. However, ethnic nationalism and extreme forms have fueled conflicts, xenophobia, and human rights abuses. The challenge is cultivating healthy national identity that provides belonging without demonising outsiders or undermining international cooperation."
-  },
-  {
-    id: 17,
-    question: "Should parents be allowed to choose their children's genetic traits?",
-    aiResponse: "Genetic selection of children's traits raises profound ethical questions about human enhancement and equality. Preventing serious genetic diseases seems clearly beneficial, but selecting for intelligence, appearance, or other traits risks commodifying children and deepening social inequalities. Most bioethicists support limiting genetic selection to medical applications while prohibiting enhancement, though the boundary between treatment and enhancement is not always clear."
-  },
-  {
-    id: 18,
-    question: "Is democracy the best form of government?",
-    aiResponse: "Democracy has proven remarkably successful at protecting individual rights, enabling peaceful transitions of power, and fostering human flourishing. However, it faces challenges including short-term thinking, vulnerability to populism, and difficulty addressing complex technical issues. While no system is perfect, democracy's self-correcting mechanisms and respect for human dignity make it preferable to alternatives, though democratic institutions require constant renewal and adaptation."
-  },
-  {
-    id: 19,
-    question: "Should we colonise other planets?",
-    aiResponse: "Space colonisation presents both exciting possibilities and serious ethical considerations. Becoming a multi-planetary species could ensure humanity's long-term survival and drive technological innovation. However, the enormous resources required might be better spent addressing Earth's problems, and we risk repeating historical patterns of exploitation. A thoughtful approach would pursue space exploration while ensuring benefits are shared broadly and planetary protection protocols are followed."
-  },
-  {
-    id: 20,
-    question: "Is economic inequality inherently bad?",
-    aiResponse: "Some degree of economic inequality may be an inevitable or even useful feature of market economies, providing incentives for innovation and effort. However, extreme inequality undermines social mobility, democratic participation, and even economic growth itself. The key questions are whether inequality results from fair processes, whether everyone has genuine opportunities, and whether basic needs are met. Most evidence suggests current levels of inequality in many countries exceed what is socially optimal."
-  }
-]
-
-export function RateView({ onViewResults }: RateViewProps) {
-  const [seenResponseIds, setSeenResponseIds] = useState<number[]>([])
-  const [responseHistory, setResponseHistory] = useState<number[]>([])
-  const [historyIndex, setHistoryIndex] = useState(-1)
-  const [ratings, setRatings] = useState<Record<number, number>>({})
+export function RateView({
+  responses,
+  currentIndex,
+  ratingsCount,
+  onRatingSubmit,
+  onViewResults,
+  onGetMoreResponses,
+}: RateViewProps) {
+  const [localRatings, setLocalRatings] = useState<Record<number, number>>({})
   const [feedback, setFeedback] = useState("")
-  const [isInitialized, setIsInitialized] = useState(false)
-  
-  // Initialize first response on client only to avoid hydration mismatch
-  useEffect(() => {
-    if (!isInitialized) {
-      const randomIndex = Math.floor(Math.random() * allResponses.length)
-      const firstResponse = allResponses[randomIndex]
-      setSeenResponseIds([firstResponse.id])
-      setResponseHistory([firstResponse.id])
-      setHistoryIndex(0)
-      setIsInitialized(true)
-    }
-  }, [isInitialized])
-  
-  // Get current response from history
-  const currentResponse = historyIndex >= 0 && historyIndex < responseHistory.length
-    ? allResponses.find(r => r.id === responseHistory[historyIndex]) ?? null
-    : null
-  
-  const totalRated = Object.keys(ratings).length
-  const selectedRating = currentResponse ? ratings[currentResponse.id] ?? null : null
-  const canSeeResults = totalRated >= 6
-  const hasMoreResponses = allResponses.filter(r => !seenResponseIds.includes(r.id)).length > 0 || historyIndex < responseHistory.length - 1
-  
-  // Show "x responses rated" only when viewing the 7th response or later (historyIndex >= 6)
-  const showExtraResponsesUI = historyIndex >= 6
-  
-  // Progress bar is based on first 6 responses only
-  const progressPercent = Math.min((totalRated / 6) * 100, 100)
-  const currentDisplayNumber = Math.min(historyIndex + 1, 6)
+  const [localIndex, setLocalIndex] = useState(0)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+
+  const currentResponse = responses[localIndex] ?? null
+  const selectedRating = localRatings[localIndex] ?? null
+  const canSeeResults = ratingsCount >= 6
+  const showExtraResponsesUI = ratingsCount >= 6
+  const progressPercent = Math.min((ratingsCount / 6) * 100, 100)
+  const currentDisplayNumber = Math.min(ratingsCount + 1, 6)
+  const hasMoreResponses = localIndex < responses.length - 1 || true
 
   const handleSelectRating = (rating: number) => {
     if (!currentResponse) return
-    setRatings(prev => ({ ...prev, [currentResponse.id]: rating }))
+    setLocalRatings(prev => ({ ...prev, [localIndex]: rating }))
   }
 
   const handlePreviousResponse = () => {
-    if (historyIndex > 0) {
-      setHistoryIndex(prev => prev - 1)
+    if (localIndex > 0) {
+      setLocalIndex(prev => prev - 1)
       setFeedback("")
     }
   }
 
-  const handleNextResponse = () => {
-    if (!currentResponse) return
-    
-    // If we're not at the end of history, just move forward in history
-    if (historyIndex < responseHistory.length - 1) {
-      setHistoryIndex(prev => prev + 1)
+  const handleNextResponse = async () => {
+    if (!currentResponse || selectedRating === null || isSubmitting) return
+    setIsSubmitting(true)
+    try {
+      await onRatingSubmit({
+        question_id: currentResponse.question_id,
+        model: currentResponse.model,
+        score: selectedRating,
+        reasoning: feedback.trim() || undefined,
+      })
+      if (localIndex >= responses.length - 1) {
+        await onGetMoreResponses()
+      }
+      setLocalIndex(prev => prev + 1)
       setFeedback("")
-      return
+    } finally {
+      setIsSubmitting(false)
     }
-    
-    // Otherwise, pick a new random unseen response
-    const unseenResponses = allResponses.filter(r => !seenResponseIds.includes(r.id))
-    if (unseenResponses.length === 0) {
-      // No more responses available
-      onViewResults()
-      return
-    }
-    
-    const randomIndex = Math.floor(Math.random() * unseenResponses.length)
-    const nextResponse = unseenResponses[randomIndex]
-    
-    setSeenResponseIds(prev => [...prev, nextResponse.id])
-    setResponseHistory(prev => [...prev, nextResponse.id])
-    setHistoryIndex(prev => prev + 1)
-    setFeedback("")
   }
 
   const handleSeeResults = () => {
     onViewResults()
   }
 
-  // Show loading state until initialized
-  if (!isInitialized || !currentResponse) {
+  if (!currentResponse) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <p className="text-muted-foreground">{!isInitialized ? "Loading..." : "No more responses available."}</p>
+        <p className="text-muted-foreground">Loading...</p>
       </div>
     )
   }
@@ -212,7 +85,7 @@ export function RateView({ onViewResults }: RateViewProps) {
         <div className="flex items-center justify-center h-10">
           <span className="text-xs text-muted-foreground tracking-wide">
             {showExtraResponsesUI 
-              ? `${totalRated} response${totalRated !== 1 ? 's' : ''} rated`
+              ? `${ratingsCount} response${ratingsCount !== 1 ? 's' : ''} rated`
               : `Response ${currentDisplayNumber} of 6`
             }
           </span>
@@ -233,7 +106,7 @@ export function RateView({ onViewResults }: RateViewProps) {
         <div className="w-full max-w-[640px]">
           
           {/* Back button */}
-          {historyIndex > 0 && (
+          {localIndex > 0 && (
             <div className="mb-4">
               <button
                 onClick={handlePreviousResponse}
@@ -266,7 +139,7 @@ export function RateView({ onViewResults }: RateViewProps) {
               The question:
             </span>
             <p className="text-foreground text-lg font-medium leading-relaxed">
-              {currentResponse.question}
+              {currentResponse.prompt}
             </p>
           </div>
           
@@ -285,7 +158,7 @@ export function RateView({ onViewResults }: RateViewProps) {
               AI Response
             </span>
             <p className="text-foreground/90 leading-relaxed">
-              {currentResponse.aiResponse}
+              {currentResponse.response_text}
             </p>
           </div>
           
