@@ -47,7 +47,13 @@ export function RateView({
   }
 
   const handleNextResponse = async () => {
-    if (!currentResponse || selectedRating === null || isSubmitting) return
+    if (!currentResponse || isSubmitting) return
+    if (localIndex < ratingsCount) {
+      setLocalIndex(prev => prev + 1)
+      setFeedback("")
+      return
+    }
+    if (selectedRating === null) return
     setIsSubmitting(true)
     try {
       await onRatingSubmit({
