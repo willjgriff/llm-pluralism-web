@@ -4,6 +4,8 @@ from app.config import FRONTEND_URL
 from app.database import engine, Base
 from app.routers import session
 from app.routers import rating
+from app.routers import results
+from app.routers import responses
 
 Base.metadata.create_all(bind=engine)
 
@@ -19,6 +21,8 @@ app.add_middleware(
 
 app.include_router(session.router)
 app.include_router(rating.router)
+app.include_router(results.router)
+app.include_router(responses.router)
 
 @app.get("/health")
 def health():

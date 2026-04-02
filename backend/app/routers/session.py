@@ -9,7 +9,7 @@ from app.models.database import Session
 
 router = APIRouter()
 
-RESPONSES_PATH = Path(__file__).parent.parent.parent.parent / "exported_AI_responses.json"
+RESPONSES_PATH = Path(__file__).parent.parent / "data" / "exported_AI_responses.json"
 
 AXIS_QUESTIONS = {
     "economic": [1, 2, 3, 4, 5, 6],
