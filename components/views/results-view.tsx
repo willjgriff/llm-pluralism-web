@@ -248,7 +248,7 @@ llm-pluralism.vercel.app`
             className="text-center text-sm mx-auto"
             style={{ color: WHITE_40, maxWidth: "560px" }}
           >
-            These are not the latest versions from each organisation, but research suggests value alignment patterns are consistent across model generations — your match is likely to reflect your experience with newer versions too.
+            These are not the latest versions from each organisation, but research suggests value alignment patterns are consistent across model generations. Your match is likely to reflect your experience with newer versions too.
           </p>
         </section>
 
@@ -274,11 +274,20 @@ llm-pluralism.vercel.app`
         {/* Section 3 — How Your Worldview Compares */}
         <section className="mb-16">
           <h3 
-            className="text-2xl font-semibold text-center mb-8"
+            className="text-2xl font-semibold text-center mb-2"
             style={{ color: "rgba(255, 255, 255, 0.95)" }}
           >
             How your score compares
           </h3>
+          {!results.use_live_data && (
+            <p
+              className="text-sm text-center mb-8"
+              style={{ color: WHITE_40 }}
+            >
+              Currently based on AI evaluator data, updates with real participant data as more people complete the survey
+            </p>
+          )}
+          {results.use_live_data && <div className="mb-8" />}
 
           {/* Horizontal bar chart with animated height */}
           <div 
@@ -368,17 +377,10 @@ llm-pluralism.vercel.app`
             style={{ color: WHITE_60 }}
           >
             {chartExpanded 
-              ? "Globalists rate AI highest, Religious personas lowest. People with different values rate AI responses very differently — a pattern consistent across our full evaluation dataset."
-              : `You rated AI ${userMeanScore}/5 on average. The average ${personaProfile.primaryPersona} rates AI ${personaAvgScore}/5 — you are ${userMeanScore > personaAvgScore ? 'more' : 'less'} positive about AI than most people with your values.`
-            }
-          </p>
-          <p 
-            className="text-sm"
-            style={{ color: WHITE_40 }}
-          >
-            {results.use_live_data
-              ? "Chart shows live data from real participants."
-              : "Chart shows illustrative data based on our evaluation dataset. Live participant data will appear as more people complete the survey."
+              ? "People with more progressive value profiles consistently find AI more reasonable, a pattern that holds across our full evaluation dataset."
+              : isCentrist
+                ? `You rated AI ${userMeanScore}/5 on average. Your values are broadly centrist, we don't yet have enough participant data to compare you to a specific group.`
+                : `You rated AI ${userMeanScore}/5 on average. The average ${personaProfile.primaryPersona} rates AI ${personaAvgScore}/5, you are ${userMeanScore > personaAvgScore ? 'more' : 'less'} positive about AI than most people with your values.`
             }
           </p>
         </section>
