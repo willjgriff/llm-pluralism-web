@@ -38,10 +38,3 @@ Environment variables:
 cd backend/
 uv run pytest tests/ -v
 ```
-
-If you get an import error like `ModuleNotFoundError: No module named 'app'`, run:
-
-```bash
-cd backend/
-PYTHONPATH=. uv run pytest tests/ -v
-```
