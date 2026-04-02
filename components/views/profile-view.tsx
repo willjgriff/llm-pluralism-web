@@ -1,12 +1,14 @@
 "use client"
 
 import { ValueSliders } from "@/components/value-sliders"
+import { PersonaProfile } from "@/lib/types"
 
 interface ProfileViewProps {
-  onNavigate: (view: string) => void
+  personaProfile: PersonaProfile
+  onStartRating: () => void
 }
 
-export function ProfileView({ onNavigate }: ProfileViewProps) {
+export function ProfileView({ personaProfile, onStartRating }: ProfileViewProps) {
   return (
     <div className="min-h-screen flex items-center justify-center">
       {/* Content */}
@@ -29,7 +31,7 @@ export function ProfileView({ onNavigate }: ProfileViewProps) {
           className="text-3xl sm:text-4xl font-bold text-center mb-3 text-balance"
           style={{ color: "rgba(255, 255, 255, 0.95)" }}
         >
-          Your primary value dimension is <span style={{ color: "rgb(94, 170, 168)" }}>Libertarian</span>
+          Your primary value dimension is <span style={{ color: "rgb(94, 170, 168)" }}>{personaProfile.primaryPersona}</span>
         </h1>
 
         {/* Subheading */}
@@ -48,7 +50,7 @@ export function ProfileView({ onNavigate }: ProfileViewProps) {
         {/* CTA Button */}
         <div className="flex justify-center">
           <button
-            onClick={() => onNavigate("rate")}
+            onClick={onStartRating}
             className="px-8 py-3 rounded-lg font-medium text-base transition-all duration-200 hover:opacity-90"
             style={{ 
               backgroundColor: "rgb(94, 170, 168)",

@@ -2,9 +2,15 @@
 
 import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
+import { AIResponse, Rating } from "@/lib/types"
 
 interface RateViewProps {
-  onNavigate: (view: string) => void
+  responses: AIResponse[]
+  currentIndex: number
+  ratingsCount: number
+  onRatingSubmit: (rating: Rating) => Promise<void>
+  onViewResults: () => void
+  onGetMoreResponses: () => void
 }
 
 const allResponses = [
@@ -110,7 +116,7 @@ const allResponses = [
   }
 ]
 
-export function RateView({ onNavigate }: RateViewProps) {
+export function RateView({ onViewResults }: RateViewProps) {
   const [seenResponseIds, setSeenResponseIds] = useState<number[]>([])
   const [responseHistory, setResponseHistory] = useState<number[]>([])
   const [historyIndex, setHistoryIndex] = useState(-1)
@@ -173,7 +179,7 @@ export function RateView({ onNavigate }: RateViewProps) {
     const unseenResponses = allResponses.filter(r => !seenResponseIds.includes(r.id))
     if (unseenResponses.length === 0) {
       // No more responses available
-      onNavigate("results")
+      onViewResults()
       return
     }
     
@@ -187,7 +193,7 @@ export function RateView({ onNavigate }: RateViewProps) {
   }
 
   const handleSeeResults = () => {
-    onNavigate("results")
+    onViewResults()
   }
 
   // Show loading state until initialized

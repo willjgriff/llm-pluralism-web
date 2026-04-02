@@ -15,10 +15,10 @@ const questions = [
 ]
 
 interface QuestionnaireViewProps {
-  onNavigate: (view: string) => void
+  onComplete: (answers: number[]) => void
 }
 
-export function QuestionnaireView({ onNavigate }: QuestionnaireViewProps) {
+export function QuestionnaireView({ onComplete }: QuestionnaireViewProps) {
   const [answers, setAnswers] = useState<Record<number, number>>({})
   
   const answeredCount = Object.keys(answers).length
@@ -27,6 +27,12 @@ export function QuestionnaireView({ onNavigate }: QuestionnaireViewProps) {
 
   const handleSelect = (questionIndex: number, value: number) => {
     setAnswers(prev => ({ ...prev, [questionIndex]: value }))
+  }
+
+  const handleContinue = () => {
+    if (!allAnswered) return
+    const orderedAnswers = questions.map((_, index) => answers[index])
+    onComplete(orderedAnswers)
   }
 
   return (
@@ -84,7 +90,7 @@ export function QuestionnaireView({ onNavigate }: QuestionnaireViewProps) {
           <Button 
             size="lg"
             disabled={!allAnswered}
-            onClick={() => allAnswered && onNavigate("profile")}
+            onClick={handleContinue}
             className="px-10 py-6 text-base font-medium bg-accent text-accent-foreground hover:bg-accent/90 transition-all duration-200 shadow-lg shadow-accent/25 disabled:opacity-40 disabled:shadow-none disabled:cursor-not-allowed"
           >
             Continue

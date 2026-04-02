@@ -4,10 +4,10 @@ import { Clock, ListChecks, BarChart3 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
 interface LandingViewProps {
-  onNavigate: (view: string) => void
+  onStart: () => void
 }
 
-export function LandingView({ onNavigate }: LandingViewProps) {
+export function LandingView({ onStart }: LandingViewProps) {
   return (
     <div className="min-h-screen flex items-center justify-center">
       {/* Soft radial gradient glow behind headline */}
@@ -47,7 +47,7 @@ export function LandingView({ onNavigate }: LandingViewProps) {
         {/* CTA Button */}
         <Button 
           size="lg" 
-          onClick={() => onNavigate("questionnaire")}
+          onClick={onStart}
           className="px-10 py-6 text-base font-medium bg-accent text-accent-foreground hover:bg-accent/90 transition-all duration-200 shadow-lg shadow-accent/25"
         >
           Start

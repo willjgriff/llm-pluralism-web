@@ -3,9 +3,12 @@
 import { useState } from "react"
 import { ValueSliders } from "@/components/value-sliders"
 import { BarChart, Bar, XAxis, YAxis, Cell, ResponsiveContainer, LabelList } from "recharts"
+import { PersonaProfile, Results } from "@/lib/types"
 
 interface ResultsViewProps {
-  onNavigate: (view: string) => void
+  results: Results
+  personaProfile: PersonaProfile
+  onReset: () => void
 }
 
 const modelScores = [
@@ -45,7 +48,7 @@ const getBarColor = (type: string) => {
   }
 }
 
-export function ResultsView({ onNavigate }: ResultsViewProps) {
+export function ResultsView({ onReset }: ResultsViewProps) {
   const [copied, setCopied] = useState(false)
   const [chartExpanded, setChartExpanded] = useState(false)
   
@@ -66,7 +69,7 @@ llm-pluralism.vercel.app`
   }
 
   const handleStartOver = () => {
-    onNavigate("landing")
+    onReset()
   }
 
   return (
