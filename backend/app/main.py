@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.config import FRONTEND_URL
 from app.database import engine, Base
 from app.routers import session
+from app.routers import rating
 
 Base.metadata.create_all(bind=engine)
 
@@ -17,6 +18,7 @@ app.add_middleware(
 )
 
 app.include_router(session.router)
+app.include_router(rating.router)
 
 @app.get("/health")
 def health():
