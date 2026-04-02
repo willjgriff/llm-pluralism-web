@@ -59,6 +59,9 @@ export function RateView({
       if (localIndex >= responses.length - 1) {
         await onGetMoreResponses()
       }
+      if (document.activeElement instanceof HTMLElement) {
+        document.activeElement.blur()
+      }
       setLocalIndex(prev => prev + 1)
       setFeedback("")
     } finally {
@@ -69,6 +72,22 @@ export function RateView({
   const handleSeeResults = () => {
     onViewResults()
   }
+
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      const target = event.target as HTMLElement | null
+      if (target && ["TEXTAREA", "INPUT", "SELECT"].includes(target.tagName)) return
+      if (target?.isContentEditable) return
+      if (selectedRating === null || isSubmitting) return
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault()
+        void handleNextResponse()
+      }
+    }
+
+    window.addEventListener("keydown", handleKeyDown)
+    return () => window.removeEventListener("keydown", handleKeyDown)
+  }, [selectedRating, isSubmitting, currentResponse, localIndex, responses.length, feedback])
 
   if (!currentResponse) {
     return (

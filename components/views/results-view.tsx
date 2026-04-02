@@ -11,31 +11,11 @@ interface ResultsViewProps {
   onReset: () => void
 }
 
-const modelScores = [
-  { name: "Claude 3.5 Haiku", score: 3.4, isBest: true },
-  { name: "GPT-4.1 mini", score: 2.8, isBest: false },
-  { name: "Grok 4 Fast", score: 2.5, isBest: false },
-]
-
-// Collapsed view data
-const collapsedChartData = [
-  { persona: "You", score: 3.4, type: "user" },
-  { persona: "Libertarian avg", score: 2.7, type: "personaAvg" },
-  { persona: "Overall avg", score: 3.1, type: "overall" },
-]
-
-// Expanded view data - all persona groups
-const expandedChartData = [
-  { persona: "You", score: 3.4, type: "user" },
-  { persona: "Libertarian", score: 2.7, type: "userPersona" },
-  { persona: "Collectivist", score: 3.6, type: "other" },
-  { persona: "Nationalist", score: 2.8, type: "other" },
-  { persona: "Globalist", score: 3.9, type: "other" },
-  { persona: "Tech Optimist", score: 3.3, type: "other" },
-  { persona: "Tech Sceptic", score: 2.9, type: "other" },
-  { persona: "Religious", score: 2.5, type: "other" },
-  { persona: "Secularist", score: 3.5, type: "other" },
-]
+const MODEL_LABS: Record<string, string> = {
+  "openrouter:anthropic/claude-3.5-haiku": "by Anthropic",
+  "openai:gpt-4.1-mini": "by OpenAI",
+  "openrouter:x-ai/grok-4-fast": "by xAI",
+}
 
 const getBarColor = (type: string) => {
   switch (type) {
@@ -48,9 +28,36 @@ const getBarColor = (type: string) => {
   }
 }
 
-export function ResultsView({ onReset }: ResultsViewProps) {
+export function ResultsView({ results, personaProfile, onReset }: ResultsViewProps) {
   const [copied, setCopied] = useState(false)
   const [chartExpanded, setChartExpanded] = useState(false)
+
+  const userMeanScore = results.model_scores.length > 0
+    ? Math.round((results.model_scores.reduce((sum, m) => sum + m.mean_score, 0) / results.model_scores.length) * 10) / 10
+    : 0
+
+  const personaAvgScore = results.aggregate_by_persona.find(
+    p => p.persona === personaProfile.primaryPersona
+  )?.mean_score ?? 0
+
+  const overallAvgScore = results.aggregate_by_persona.length > 0
+    ? Math.round((results.aggregate_by_persona.reduce((sum, p) => sum + p.mean_score, 0) / results.aggregate_by_persona.length) * 10) / 10
+    : 0
+
+  const collapsedChartData = [
+    { persona: "You", score: userMeanScore, type: "user" },
+    { persona: `${personaProfile.primaryPersona} avg`, score: personaAvgScore, type: "personaAvg" },
+    { persona: "Overall avg", score: overallAvgScore, type: "overall" },
+  ]
+
+  const expandedChartData = [
+    { persona: "You", score: userMeanScore, type: "user" },
+    ...results.aggregate_by_persona.map(p => ({
+      persona: p.persona,
+      score: p.mean_score,
+      type: p.persona === personaProfile.primaryPersona ? "userPersona" : "other",
+    })),
+  ]
   
   const chartData = chartExpanded ? expandedChartData : collapsedChartData
   const chartHeight = chartExpanded ? 360 : 140
@@ -116,19 +123,19 @@ llm-pluralism.vercel.app`
               className="text-3xl font-bold"
               style={{ color: "rgba(255, 255, 255, 0.95)" }}
             >
-              Claude 3.5 Haiku
+              {results.best_match.model_display_name}
             </p>
             <p 
               className="text-sm mt-1"
               style={{ color: "rgba(255, 255, 255, 0.5)" }}
             >
-              by Anthropic
+              {MODEL_LABS[results.best_match.model] ?? ""}
             </p>
             <p 
               className="text-sm mt-3"
               style={{ color: "rgba(255, 255, 255, 0.6)" }}
             >
-              Claude produced the responses you rated most reasonable across your session.
+              {results.best_match.model_display_name} produced the responses you rated most reasonable across your session.
             </p>
           </div>
 
@@ -142,13 +149,13 @@ llm-pluralism.vercel.app`
 
           {/* Three model score cards */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6">
-            {modelScores.map((model) => (
+            {results.model_scores.map((model) => (
               <div 
-                key={model.name}
+                key={model.model}
                 className="rounded-xl p-4"
                 style={{ 
                   backgroundColor: "rgba(255, 255, 255, 0.03)",
-                  border: model.isBest 
+                  border: model.model === results.best_match.model
                     ? "1px solid rgba(45, 212, 191, 0.3)" 
                     : "1px solid rgba(255, 255, 255, 0.1)"
                 }}
@@ -157,14 +164,14 @@ llm-pluralism.vercel.app`
                   className="text-sm font-medium mb-2"
                   style={{ color: "rgba(255, 255, 255, 0.9)" }}
                 >
-                  {model.name}
+                  {model.model_display_name}
                 </p>
                 <div className="flex items-baseline gap-1 mb-2">
                   <span 
                     className="text-2xl font-bold"
                     style={{ color: "rgb(94, 170, 168)" }}
                   >
-                    {model.score}
+                    {model.mean_score}
                   </span>
                   <span 
                     className="text-xs"
@@ -181,7 +188,7 @@ llm-pluralism.vercel.app`
                   <div 
                     className="h-full rounded-full"
                     style={{ 
-                      width: `${(model.score / 5) * 100}%`,
+                      width: `${(model.mean_score / 5) * 100}%`,
                       backgroundColor: "rgb(94, 170, 168)"
                     }}
                   />
@@ -204,7 +211,7 @@ llm-pluralism.vercel.app`
             className="text-2xl font-bold text-center mb-3"
             style={{ color: "rgba(255, 255, 255, 0.95)" }}
           >
-            Your primary value dimension is <span style={{ color: "rgb(94, 170, 168)" }}>Libertarian</span>
+            Your primary value dimension is <span style={{ color: "rgb(94, 170, 168)" }}>{personaProfile.primaryPersona}</span>
           </h2>
 
           <p 
@@ -214,7 +221,7 @@ llm-pluralism.vercel.app`
             Here&apos;s how your values map across all four dimensions
           </p>
 
-          <ValueSliders />
+          <ValueSliders personaProfile={personaProfile} />
         </section>
 
         {/* Section 3 — How Your Worldview Compares */}
@@ -317,14 +324,17 @@ llm-pluralism.vercel.app`
           >
             {chartExpanded 
               ? "Globalists rate AI highest, Religious personas lowest. People with different values rate AI responses very differently — a pattern consistent across our full evaluation dataset."
-              : "You rated AI 0.7 points higher than the average Libertarian. This suggests you find current AI models more reasonable than others who share your economic values."
+              : `You rated AI ${userMeanScore}/5 on average. The average ${personaProfile.primaryPersona} rates AI ${personaAvgScore}/5 — you are ${userMeanScore > personaAvgScore ? 'more' : 'less'} positive about AI than most people with your values.`
             }
           </p>
           <p 
             className="text-sm"
             style={{ color: "rgba(255, 255, 255, 0.4)" }}
           >
-            Chart shows illustrative data based on our evaluation dataset. Live participant data will appear as more people complete the survey.
+            {results.use_live_data
+              ? "Chart shows live data from real participants."
+              : "Chart shows illustrative data based on our evaluation dataset. Live participant data will appear as more people complete the survey."
+            }
           </p>
         </section>
 
@@ -355,19 +365,21 @@ llm-pluralism.vercel.app`
               className="text-sm font-medium mt-1"
               style={{ color: "rgba(255, 255, 255, 0.9)" }}
             >
-              Libertarian · Globalist · Tech Sceptic · Secularist
+              {[personaProfile.economic, personaProfile.identity, personaProfile.technology, personaProfile.society]
+                .filter(p => p !== 'Neutral')
+                .join(' · ')}
             </p>
             <p 
               className="text-base font-semibold mt-2"
               style={{ color: "rgba(255, 255, 255, 0.95)" }}
             >
-              My AI match: Claude 3.5 Haiku
+              My AI match: {results.best_match.model_display_name}
             </p>
             <p 
               className="text-sm"
               style={{ color: "rgba(255, 255, 255, 0.6)" }}
             >
-              Rated AI responses 3.4/5 for reasonableness
+              Rated AI responses {userMeanScore}/5 for reasonableness
             </p>
             <p 
               className="text-sm mt-2"
@@ -414,7 +426,7 @@ llm-pluralism.vercel.app`
           
           <div className="flex justify-center mb-6">
             <a 
-              href="https://github.com" 
+              href="https://github.com/willjgriff/llm-pluralism" 
               target="_blank" 
               rel="noopener noreferrer"
               className="text-sm font-medium transition-opacity hover:opacity-80"
