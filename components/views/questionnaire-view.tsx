@@ -16,9 +16,12 @@ const questions = [
 
 interface QuestionnaireViewProps {
   onComplete: (answers: number[]) => void
+  isLoading?: boolean
+  error?: string | null
+  onClearError?: () => void
 }
 
-export function QuestionnaireView({ onComplete }: QuestionnaireViewProps) {
+export function QuestionnaireView({ onComplete, isLoading, error, onClearError }: QuestionnaireViewProps) {
   const [answers, setAnswers] = useState<Record<number, number>>({})
   
   const answeredCount = Object.keys(answers).length
@@ -89,12 +92,28 @@ export function QuestionnaireView({ onComplete }: QuestionnaireViewProps) {
         <div className="mt-10 text-center">
           <Button 
             size="lg"
-            disabled={!allAnswered}
+            disabled={!allAnswered || isLoading}
             onClick={handleContinue}
             className="px-10 py-6 text-base font-medium bg-accent text-accent-foreground hover:bg-accent/90 transition-all duration-200 shadow-lg shadow-accent/25 disabled:opacity-40 disabled:shadow-none disabled:cursor-not-allowed"
           >
-            Continue
+            {isLoading ? "Connecting..." : "Continue"}
           </Button>
+          {error && (
+            <div className="mt-4 flex items-center justify-center gap-3">
+              <p className="text-sm" style={{ color: "rgba(255, 100, 100, 0.9)" }}>
+                {error}
+              </p>
+              {onClearError && (
+                <button
+                  onClick={onClearError}
+                  className="text-sm underline"
+                  style={{ color: "rgba(255, 100, 100, 0.7)" }}
+                >
+                  Dismiss
+                </button>
+              )}
+            </div>
+          )}
         </div>
       </div>
     </div>

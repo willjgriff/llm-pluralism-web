@@ -11,6 +11,9 @@ interface RateViewProps {
   onRatingSubmit: (rating: Rating) => Promise<void>
   onViewResults: () => void
   onGetMoreResponses: () => void
+  isLoading?: boolean
+  error?: string | null
+  onClearError?: () => void
 }
 
 export function RateView({
@@ -20,11 +23,15 @@ export function RateView({
   onRatingSubmit,
   onViewResults,
   onGetMoreResponses,
+  isLoading,
+  error,
+  onClearError,
 }: RateViewProps) {
   const [localRatings, setLocalRatings] = useState<Record<number, number>>({})
   const [feedback, setFeedback] = useState("")
   const [localIndex, setLocalIndex] = useState(0)
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [ratingError, setRatingError] = useState<string | null>(null)
 
   const currentResponse = responses[localIndex] ?? null
   const selectedRating = localRatings[localIndex] ?? null
@@ -47,14 +54,9 @@ export function RateView({
   }
 
   const handleNextResponse = async () => {
-    if (!currentResponse || isSubmitting) return
-    if (localIndex < ratingsCount) {
-      setLocalIndex(prev => prev + 1)
-      setFeedback("")
-      return
-    }
-    if (selectedRating === null) return
+    if (!currentResponse || selectedRating === null || isSubmitting) return
     setIsSubmitting(true)
+    setRatingError(null)
     try {
       await onRatingSubmit({
         question_id: currentResponse.question_id,
@@ -70,6 +72,8 @@ export function RateView({
       }
       setLocalIndex(prev => prev + 1)
       setFeedback("")
+    } catch (err) {
+      setRatingError("Couldn't save your rating. Please try again.")
     } finally {
       setIsSubmitting(false)
     }
@@ -246,6 +250,11 @@ export function RateView({
           </div>
           
           {/* Buttons */}
+          {ratingError && (
+            <p className="text-sm text-center mb-4" style={{ color: "rgba(255, 100, 100, 0.9)" }}>
+              {ratingError}
+            </p>
+          )}
           <div className="text-center">
             {canSeeResults ? (
               <div className="flex justify-center gap-4">
@@ -261,6 +270,7 @@ export function RateView({
                   size="lg"
                   variant="outline"
                   onClick={handleSeeResults}
+                  disabled={isLoading}
                   className="px-8 py-6 text-base font-medium transition-all duration-200"
                   style={{
                     borderColor: "rgb(94, 170, 168)",
@@ -268,7 +278,7 @@ export function RateView({
                     backgroundColor: "transparent"
                   }}
                 >
-                  See My Results
+                  {isLoading ? "Loading results..." : "See My Results"}
                 </Button>
               </div>
             ) : (
@@ -286,6 +296,20 @@ export function RateView({
             {showExtraResponsesUI && (
               <p className="text-xs text-muted-foreground italic mt-4">
                 More responses = a more accurate AI match
+              </p>
+            )}
+            {error && (
+              <p className="text-sm text-center mt-4" style={{ color: "rgba(255, 100, 100, 0.9)" }}>
+                {error}
+                {onClearError && (
+                  <button
+                    onClick={onClearError}
+                    className="ml-2 underline"
+                    style={{ color: "rgba(255, 100, 100, 0.7)" }}
+                  >
+                    Dismiss
+                  </button>
+                )}
               </p>
             )}
           </div>

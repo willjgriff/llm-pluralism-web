@@ -30,6 +30,8 @@ export default function Home() {
   const [isTransitioning, setIsTransitioning] = useState(false)
   const [displayedView, setDisplayedView] = useState<View>("landing")
   const [appState, setAppState] = useState<AppState>(INITIAL_STATE)
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     const isRepeat = !!localStorage.getItem("llm_pluralism_completed")
@@ -55,52 +57,77 @@ export default function Home() {
   }
 
   const handleQuestionnaireComplete = async (answers: number[]) => {
-    const isRepeat = !!localStorage.getItem("llm_pluralism_completed")
-    const personaProfile = assignPersonas(answers)
-    const sessionResponse = await createSession(answers, isRepeat)
-    const seenKeys = sessionResponse.responses.map(
-      (r: AIResponse) => `${r.question_id}:${r.model}`
-    )
-    setAppState(prev => ({
-      ...prev,
-      answers,
-      personaProfile,
-      sessionId: sessionResponse.session_id,
-      responses: sessionResponse.responses,
-      seenResponseKeys: seenKeys,
-      currentResponseIndex: 0,
-      isRepeatSession: isRepeat,
-    }))
-    handleNavigate("profile")
+    setIsLoading(true)
+    setError(null)
+    try {
+      const isRepeat = !!localStorage.getItem("llm_pluralism_completed")
+      const personaProfile = assignPersonas(answers)
+      const sessionResponse = await createSession(answers, isRepeat)
+      const seenKeys = sessionResponse.responses.map(
+        (r: AIResponse) => `${r.question_id}:${r.model}`
+      )
+      setAppState(prev => ({
+        ...prev,
+        answers,
+        personaProfile,
+        sessionId: sessionResponse.session_id,
+        responses: sessionResponse.responses,
+        seenResponseKeys: seenKeys,
+        currentResponseIndex: 0,
+        isRepeatSession: isRepeat,
+      }))
+      handleNavigate("profile")
+    } catch (err) {
+      setError("Couldn't connect to the server. Please try again.")
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   const handleRatingSubmit = async (rating: Rating) => {
     if (!appState.sessionId) return
-    await submitRating(appState.sessionId, rating)
-    setAppState(prev => ({
-      ...prev,
-      ratings: [...prev.ratings, rating],
-      currentResponseIndex: prev.currentResponseIndex + 1,
-    }))
+    try {
+      await submitRating(appState.sessionId, rating)
+      setAppState(prev => ({
+        ...prev,
+        ratings: [...prev.ratings, rating],
+        currentResponseIndex: prev.currentResponseIndex + 1,
+      }))
+    } catch (err) {
+      throw new Error("Failed to save rating")
+    }
   }
 
   const handleViewResults = async () => {
     if (!appState.sessionId) return
-    const results = await getResults(appState.sessionId)
-    localStorage.setItem("llm_pluralism_completed", "true")
-    setAppState(prev => ({ ...prev, results }))
-    handleNavigate("results")
+    setIsLoading(true)
+    setError(null)
+    try {
+      const results = await getResults(appState.sessionId)
+      localStorage.setItem("llm_pluralism_completed", "true")
+      setAppState(prev => ({ ...prev, results }))
+      handleNavigate("results")
+    } catch (err) {
+      setError("Couldn't load your results. Please try again.")
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   const handleGetMoreResponses = async () => {
     if (!appState.sessionId) return
-    const more = await getMoreResponses(appState.sessionId, appState.seenResponseKeys)
-    const newKeys = more.map((r: AIResponse) => `${r.question_id}:${r.model}`)
-    setAppState(prev => ({
-      ...prev,
-      responses: [...prev.responses, ...more],
-      seenResponseKeys: [...prev.seenResponseKeys, ...newKeys],
-    }))
+    try {
+      const more = await getMoreResponses(appState.sessionId, appState.seenResponseKeys)
+      const newKeys = more.map((r: AIResponse) => `${r.question_id}:${r.model}`)
+      setAppState(prev => ({
+        ...prev,
+        responses: [...prev.responses, ...more],
+        seenResponseKeys: [...prev.seenResponseKeys, ...newKeys],
+      }))
+    } catch (err) {
+      // Fail silently — user can still see results
+      console.error("Failed to load more responses:", err)
+    }
   }
 
   const handleReset = () => {
@@ -125,7 +152,12 @@ export default function Home() {
           <LandingView onStart={() => handleNavigate("questionnaire")} />
         )}
         {displayedView === "questionnaire" && (
-          <QuestionnaireView onComplete={handleQuestionnaireComplete} />
+          <QuestionnaireView
+            onComplete={handleQuestionnaireComplete}
+            isLoading={isLoading}
+            error={error}
+            onClearError={() => setError(null)}
+          />
         )}
         {displayedView === "profile" && appState.personaProfile && (
           <ProfileView
@@ -141,6 +173,9 @@ export default function Home() {
             onRatingSubmit={handleRatingSubmit}
             onViewResults={handleViewResults}
             onGetMoreResponses={handleGetMoreResponses}
+            isLoading={isLoading}
+            error={error}
+            onClearError={() => setError(null)}
           />
         )}
         {displayedView === "results" && appState.results && appState.personaProfile && (
