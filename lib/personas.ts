@@ -22,7 +22,7 @@ export function assignPersonas(answers: number[]): PersonaProfile {
     { axis: 'society' as const, score: Math.abs(societyScore) },
   ]
 
-  const dominant = axisScores.reduce((a, b) => a.score > b.score ? a : b)
+  const dominant = axisScores.reduce((a, b) => a.score >= b.score ? a : b)
   const isCentrist = dominant.score < THRESHOLD
 
   let primaryPersona: PersonaProfile['primaryPersona'] = 'Centrist'

@@ -44,7 +44,7 @@ export function ProfileView({ personaProfile, onStartRating }: ProfileViewProps)
 
         {/* Value sliders component */}
         <div className="mb-12">
-          <ValueSliders />
+          <ValueSliders personaProfile={personaProfile} />
         </div>
 
         {/* CTA Button */}
