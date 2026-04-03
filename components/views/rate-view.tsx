@@ -32,13 +32,23 @@ export function RateView({
   const [localIndex, setLocalIndex] = useState(0)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [ratingError, setRatingError] = useState<string | null>(null)
+  /** Once the user picks a score on the 7th+ card, keep the "N responses rated" headline (not "Response 6 of 6") on later cards before they pick again. */
+  const [headlineRatedMode, setHeadlineRatedMode] = useState(false)
 
   const currentResponse = responses[localIndex] ?? null
   const selectedRating = localRatings[localIndex] ?? null
   const canSeeResults = ratingsCount >= 6
-  /** Stay on "Response X of 6" until the user picks a score on the 7th+ card (parent updates ratingsCount before localIndex advances). */
-  const showExtraResponsesUI =
-    ratingsCount >= 6 && localIndex >= 6 && selectedRating !== null
+
+  useEffect(() => {
+    if (ratingsCount >= 6 && localIndex >= 6 && selectedRating !== null) {
+      setHeadlineRatedMode(true)
+    }
+  }, [ratingsCount, localIndex, selectedRating])
+
+  const showRatedHeadline = headlineRatedMode && localIndex >= 6
+  /** While the current card has a chosen score but is not yet submitted, `ratingsCount` is still the saved count — include this card in the headline. */
+  const displayRatedCount =
+    ratingsCount + (selectedRating !== null && localIndex >= ratingsCount ? 1 : 0)
   const progressPercent = Math.min((ratingsCount / 6) * 100, 100)
   const currentDisplayNumber = Math.min(ratingsCount + 1, 6)
   const hasMoreResponses = localIndex < responses.length - 1 || true
@@ -124,8 +134,8 @@ export function RateView({
       <div className="fixed top-0 left-0 right-0 z-20" style={{ backgroundColor: "#080810" }}>
         <div className="flex items-center justify-center h-10">
           <span className="text-xs text-muted-foreground tracking-wide">
-            {showExtraResponsesUI 
-              ? `${ratingsCount} response${ratingsCount !== 1 ? 's' : ''} rated`
+            {showRatedHeadline 
+              ? `${displayRatedCount} response${displayRatedCount !== 1 ? 's' : ''} rated`
               : `Response ${currentDisplayNumber} of 6`
             }
           </span>
@@ -304,7 +314,7 @@ export function RateView({
             )}
             
             {/* Encouragement text - only show after initial 6 responses */}
-            {showExtraResponsesUI && (
+            {showRatedHeadline && (
               <p className="text-xs text-muted-foreground italic mt-4">
                 More responses = a more accurate AI match
               </p>
