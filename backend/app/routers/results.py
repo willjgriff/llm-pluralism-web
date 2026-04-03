@@ -13,6 +13,45 @@ with open(PERSONA_SCORES_PATH) as f:
 
 router = APIRouter()
 
+
+def _session_row_to_export_dict(session: Session) -> dict:
+    """Map a Session ORM row to the flat dict shape used by /export/all."""
+    return {
+        "id": session.id,
+        "created_at": str(session.created_at),
+        "is_repeat": session.is_repeat,
+        "primary_persona": session.primary_persona,
+        "economic_score": session.economic_score,
+        "identity_score": session.identity_score,
+        "technology_score": session.technology_score,
+        "society_score": session.society_score,
+    }
+
+
+def _rating_row_to_export_dict(rating: Rating) -> dict:
+    """Map a Rating ORM row to the flat dict shape used by /export/all."""
+    return {
+        "id": rating.id,
+        "session_id": rating.session_id,
+        "question_id": rating.question_id,
+        "model": rating.model,
+        "score": rating.score,
+        "reasoning": rating.reasoning,
+        "created_at": str(rating.created_at),
+    }
+
+
+@router.get("/export/all")
+def export_all(db: DBSession = Depends(get_db)):
+    """Return all rows from sessions and ratings as JSON (datetimes as str)."""
+    sessions = db.query(Session).all()
+    ratings = db.query(Rating).all()
+    return {
+        "sessions": [_session_row_to_export_dict(s) for s in sessions],
+        "ratings": [_rating_row_to_export_dict(r) for r in ratings],
+    }
+
+
 MODEL_DISPLAY_NAMES = {
     "openrouter:anthropic/claude-3.5-haiku": "Claude 3.5 Haiku",
     "openai:gpt-4.1-mini": "GPT-4.1 Mini",
