@@ -47,8 +47,33 @@ def get_results(session_id: str, db: DBSession = Depends(get_db)):
     model_scores.sort(key=lambda x: x["mean_score"], reverse=True)
     best_match = model_scores[0]
 
-    total_participants = db.query(Session).filter(Session.is_repeat == False).count()
-    use_live_data = total_participants >= 20
+    total_participants = (
+        db.query(Session)
+        .join(Rating, Rating.session_id == Session.id)
+        .filter(Session.is_repeat == False)
+        .distinct()
+        .count()
+    )
+
+    if total_participants >= 3:
+        persona_counts = (
+            db.query(Session.primary_persona, func.count(func.distinct(Session.id)).label("count"))
+            .join(Rating, Rating.session_id == Session.id)
+            .filter(Session.is_repeat == False)
+            .group_by(Session.primary_persona)
+            .all()
+        )
+        REQUIRED_PERSONAS = {
+            "Libertarian", "Collectivist", "Nationalist", "Globalist",
+            "Tech Optimist", "Tech Sceptic", "Religious", "Secularist"
+        }
+        persona_count_map = {row.primary_persona: row.count for row in persona_counts}
+        use_live_data = (
+            all(persona in persona_count_map for persona in REQUIRED_PERSONAS) and
+            all(persona_count_map[persona] >= 3 for persona in REQUIRED_PERSONAS)
+        )
+    else:
+        use_live_data = False
 
     if use_live_data:
         live_data = (

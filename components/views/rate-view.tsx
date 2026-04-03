@@ -36,7 +36,9 @@ export function RateView({
   const currentResponse = responses[localIndex] ?? null
   const selectedRating = localRatings[localIndex] ?? null
   const canSeeResults = ratingsCount >= 6
-  const showExtraResponsesUI = ratingsCount >= 6
+  /** Stay on "Response X of 6" until the user picks a score on the 7th+ card (parent updates ratingsCount before localIndex advances). */
+  const showExtraResponsesUI =
+    ratingsCount >= 6 && localIndex >= 6 && selectedRating !== null
   const progressPercent = Math.min((ratingsCount / 6) * 100, 100)
   const currentDisplayNumber = Math.min(ratingsCount + 1, 6)
   const hasMoreResponses = localIndex < responses.length - 1 || true
