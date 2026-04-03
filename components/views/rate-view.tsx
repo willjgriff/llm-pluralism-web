@@ -331,9 +331,9 @@ export function RateView({
             )}
             
             {/* Encouragement text - only show after initial 6 responses */}
-            {showRatedHeadline && (
+            {localIndex >= 6 && (
               <p className="text-xs text-muted-foreground italic mt-4">
-                More responses = a more accurate AI match
+                More responses = a more accurate AI match and better research data
               </p>
             )}
             {error && (
