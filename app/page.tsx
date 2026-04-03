@@ -88,11 +88,22 @@ export default function Home() {
     if (!appState.sessionId) return
     try {
       await submitRating(appState.sessionId, rating)
-      setAppState(prev => ({
-        ...prev,
-        ratings: [...prev.ratings, rating],
-        currentResponseIndex: prev.currentResponseIndex + 1,
-      }))
+      setAppState(prev => {
+        const existingIndex = prev.ratings.findIndex(
+          r => r.question_id === rating.question_id && r.model === rating.model
+        )
+        const isUpdate = existingIndex >= 0
+        const updatedRatings = isUpdate
+          ? prev.ratings.map((r, i) => (i === existingIndex ? rating : r))
+          : [...prev.ratings, rating]
+        return {
+          ...prev,
+          ratings: updatedRatings,
+          currentResponseIndex: isUpdate
+            ? prev.currentResponseIndex
+            : prev.currentResponseIndex + 1,
+        }
+      })
     } catch (err) {
       throw new Error("Failed to save rating")
     }

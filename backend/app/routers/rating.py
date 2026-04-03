@@ -25,6 +25,19 @@ def submit_rating(request: RatingRequest, db: DBSession = Depends(get_db)):
     if request.score < 1 or request.score > 5:
         raise HTTPException(status_code=400, detail="Score must be between 1 and 5")
 
+    existing = db.query(Rating).filter(
+        Rating.session_id == request.session_id,
+        Rating.question_id == request.question_id,
+        Rating.model == request.model,
+    ).first()
+
+    if existing:
+        existing.score = request.score
+        existing.reasoning = request.reasoning
+        db.commit()
+        db.refresh(existing)
+        return {"success": True, "rating_id": existing.id}
+
     rating = Rating(
         session_id=request.session_id,
         question_id=request.question_id,

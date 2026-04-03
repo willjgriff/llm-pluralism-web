@@ -68,6 +68,23 @@ export function RateView({
   const handleNextResponse = async () => {
     if (!currentResponse || isSubmitting) return
     if (localIndex < ratingsCount) {
+      if (selectedRating !== null) {
+        setIsSubmitting(true)
+        setRatingError(null)
+        try {
+          await onRatingSubmit({
+            question_id: currentResponse.question_id,
+            model: currentResponse.model,
+            score: selectedRating,
+            reasoning: feedback.trim() || undefined,
+          })
+        } catch {
+          setRatingError("Couldn't save your rating. Please try again.")
+          return
+        } finally {
+          setIsSubmitting(false)
+        }
+      }
       if (document.activeElement instanceof HTMLElement) {
         document.activeElement.blur()
       }
