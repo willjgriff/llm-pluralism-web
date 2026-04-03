@@ -33,8 +33,14 @@ const MODEL_LABS: Record<string, string> = {
 /** Prefix for bar row `id` so `LabelList` content still sees it after Recharts `filterProps` strips `payload` / `type`. */
 const AGGREGATE_UNAVAILABLE_ID_PREFIX = "llm-pluralism-aggregate-unavailable"
 
+/** Separator gap rows: `id` is allowlisted so bar-end labels can hide them (value is often string `"0"`). */
+const CHART_GAP_ID_PREFIX = "llm-pluralism-chart-gap"
+
 function resultsChartLabelContent(props: any) {
   const { x = 0, y = 0, width = 0, height = 0, value, id = "" } = props
+  if (String(id).startsWith(CHART_GAP_ID_PREFIX)) return null
+  const persona = props.payload?.persona ?? ""
+  if (String(persona).startsWith("__sep_")) return null
   const label = String(id).startsWith(AGGREGATE_UNAVAILABLE_ID_PREFIX)
     ? "Not yet evaluated"
     : value
@@ -58,6 +64,7 @@ const getBarColor = (type: string) => ({
   userPersona: TEAL_DARK,
   personaAvg: TEAL_DARK,
   unavailable: WHITE_05,
+  separator: "transparent",
   overall: WHITE_20,
   other: WHITE_20,
 }[type] ?? WHITE_20)
@@ -88,10 +95,27 @@ export function ResultsView({ results, personaProfile, onReset }: ResultsViewPro
     { persona: "Overall avg", score: overallAvgScore, type: "overall" },
   ]
 
-  const expandedChartData = [
-    { persona: "You", score: userMeanScore, type: "user" },
+  const PERSONA_ORDER: Record<string, number> = {
+    "You": 0,
+    "Libertarian": 1,
+    "Collectivist": 2,
+    "Nationalist": 3,
+    "Globalist": 4,
+    "Tech Optimist": 5,
+    "Tech Sceptic": 6,
+    "Religious": 7,
+    "Secularist": 8,
+    "Centrist": 9,
+  }
+
+  const PAIR_END_PERSONAS = new Set(["You", "Collectivist", "Globalist", "Tech Sceptic", "Secularist"])
+
+  const centristInAggregate = results.aggregate_by_persona.some(p => p.persona === "Centrist")
+
+  const unsortedRows = [
+    { persona: "You", score: userMeanScore, type: "user" as const },
     ...results.aggregate_by_persona.map((p, i) => {
-      const isUnavailable = isCentrist && p.persona === "Centrist" && p.mean_score === 0
+      const isUnavailable = p.mean_score === 0
       return {
         ...(isUnavailable ? { id: `${AGGREGATE_UNAVAILABLE_ID_PREFIX}-expanded-${i}` } : {}),
         persona: p.persona,
@@ -99,13 +123,30 @@ export function ResultsView({ results, personaProfile, onReset }: ResultsViewPro
         type: isUnavailable ? "unavailable" : p.persona === personaProfile.primaryPersona ? "userPersona" : "other",
       }
     }),
-    ...(isCentrist && !results.aggregate_by_persona.some(p => p.persona === "Centrist")
-      ? [{ id: `${AGGREGATE_UNAVAILABLE_ID_PREFIX}-expanded-appended`, persona: "Centrist", score: 0, type: "unavailable" }]
+    ...(!centristInAggregate
+      ? [{ id: `${AGGREGATE_UNAVAILABLE_ID_PREFIX}-centrist`, persona: "Centrist", score: 0, type: "unavailable" as const }]
       : []),
   ]
-  
+
+  const sortedRows = [...unsortedRows].sort(
+    (a, b) => (PERSONA_ORDER[a.persona] ?? 10) - (PERSONA_ORDER[b.persona] ?? 10)
+  )
+
+  const expandedChartData = sortedRows.reduce((acc: any[], entry, index) => {
+    acc.push(entry)
+    if (PAIR_END_PERSONAS.has(entry.persona) && index < sortedRows.length - 1) {
+      acc.push({
+        id: `${CHART_GAP_ID_PREFIX}-${acc.length}`,
+        persona: `__sep_${index}`,
+        score: 0,
+        type: "separator",
+      })
+    }
+    return acc
+  }, [])
+
   const chartData = chartExpanded ? expandedChartData : collapsedChartData
-  const chartHeight = chartExpanded ? 360 : 140
+  const chartHeight = chartExpanded ? 440 : 140
 
   const handleCopyToClipboard = () => {
     const personas = [personaProfile.economic, personaProfile.identity, personaProfile.technology, personaProfile.society]
@@ -299,28 +340,46 @@ llm-pluralism.vercel.app`
                 layout="vertical"
                 data={chartData}
                 margin={{ top: 0, right: 40, left: 0, bottom: 0 }}
+                barCategoryGap={8}
               >
                 <XAxis 
                   type="number" 
                   domain={[0, 5]} 
                   hide 
                 />
-                <YAxis 
-                  type="category" 
-                  dataKey="persona" 
+                <YAxis
+                  type="category"
+                  dataKey="persona"
                   axisLine={false}
                   tickLine={false}
-                  tick={{ 
-                    fill: WHITE_60, 
-                    fontSize: 12 
-                  }}
                   width={110}
+                  tick={(props: any) => {
+                    const value = props.payload?.value ?? ""
+                    if (String(value).startsWith("__sep_")) return <g />
+                    return (
+                      <text
+                        x={props.x}
+                        y={props.y}
+                        textAnchor="end"
+                        dominantBaseline="middle"
+                        fill={WHITE_60}
+                        fontSize={12}
+                      >
+                        {value}
+                      </text>
+                    )
+                  }}
                 />
-                <Bar 
-                  dataKey="score" 
+                <Bar
+                  dataKey="score"
                   radius={[0, 4, 4, 0]}
                   barSize={20}
-                  minPointSize={4}
+                  minPointSize={0}
+                  shape={(props: any) => {
+                    if (String((props as any).persona ?? "").startsWith("__sep_")) return <g />
+                    const { x, y, width, height, fill } = props as any
+                    return <rect x={x} y={y} width={Math.max(0, width)} height={height} fill={fill} rx={4} ry={4} />
+                  }}
                 >
                   {chartData.map((entry, index) => (
                     <Cell 
