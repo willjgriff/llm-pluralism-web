@@ -19,7 +19,6 @@ const INITIAL_STATE: AppState = {
   personaProfile: null,
   responses: [],
   seenResponseKeys: [],
-  currentResponseIndex: 0,
   ratings: [],
   results: null,
   isRepeatSession: false,
@@ -73,7 +72,6 @@ export default function Home() {
         sessionId: sessionResponse.session_id,
         responses: sessionResponse.responses,
         seenResponseKeys: seenKeys,
-        currentResponseIndex: 0,
         isRepeatSession: isRepeat,
       }))
       handleNavigate("profile")
@@ -99,9 +97,6 @@ export default function Home() {
         return {
           ...prev,
           ratings: updatedRatings,
-          currentResponseIndex: isUpdate
-            ? prev.currentResponseIndex
-            : prev.currentResponseIndex + 1,
         }
       })
     } catch (err) {
@@ -179,7 +174,6 @@ export default function Home() {
         {displayedView === "rate" && appState.personaProfile && (
           <RateView
             responses={appState.responses}
-            currentIndex={appState.currentResponseIndex}
             ratingsCount={appState.ratings.length}
             onRatingSubmit={handleRatingSubmit}
             onViewResults={handleViewResults}

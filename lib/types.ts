@@ -69,7 +69,6 @@ export interface AppState {
   personaProfile: PersonaProfile | null
   responses: AIResponse[]
   seenResponseKeys: string[]
-  currentResponseIndex: number
   ratings: Rating[]
   results: Results | null
   isRepeatSession: boolean

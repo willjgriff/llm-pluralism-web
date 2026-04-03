@@ -6,7 +6,6 @@ import { AIResponse, Rating } from "@/lib/types"
 
 interface RateViewProps {
   responses: AIResponse[]
-  currentIndex: number
   ratingsCount: number
   onRatingSubmit: (rating: Rating) => Promise<void>
   onViewResults: () => void
@@ -18,7 +17,6 @@ interface RateViewProps {
 
 export function RateView({
   responses,
-  currentIndex,
   ratingsCount,
   onRatingSubmit,
   onViewResults,
@@ -32,26 +30,18 @@ export function RateView({
   const [localIndex, setLocalIndex] = useState(0)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [ratingError, setRatingError] = useState<string | null>(null)
-  /** Once the user picks a score on the 7th+ card, keep the "N responses rated" headline (not "Response 6 of 6") on later cards before they pick again. */
-  const [headlineRatedMode, setHeadlineRatedMode] = useState(false)
+  /** After the user reaches response 7 (index 6), progress text drops "of 6" and stays that way even if they go back. */
+  const [progressExpandedLabel, setProgressExpandedLabel] = useState(false)
 
   const currentResponse = responses[localIndex] ?? null
   const selectedRating = localRatings[localIndex] ?? null
   const canSeeResults = ratingsCount >= 6
 
   useEffect(() => {
-    if (ratingsCount >= 6 && localIndex >= 6 && selectedRating !== null) {
-      setHeadlineRatedMode(true)
-    }
-  }, [ratingsCount, localIndex, selectedRating])
+    if (localIndex >= 6) setProgressExpandedLabel(true)
+  }, [localIndex])
 
-  const showRatedHeadline = headlineRatedMode && localIndex >= 6
-  /** While the current card has a chosen score but is not yet submitted, `ratingsCount` is still the saved count — include this card in the headline. */
-  const displayRatedCount =
-    ratingsCount + (selectedRating !== null && localIndex >= ratingsCount ? 1 : 0)
   const progressPercent = Math.min((ratingsCount / 6) * 100, 100)
-  const currentDisplayNumber = Math.min(ratingsCount + 1, 6)
-  const hasMoreResponses = localIndex < responses.length - 1 || true
 
   const handleSelectRating = (rating: number) => {
     if (!currentResponse) return
@@ -110,7 +100,7 @@ export function RateView({
       }
       setLocalIndex(prev => prev + 1)
       setFeedback("")
-    } catch (err) {
+    } catch {
       setRatingError("Couldn't save your rating. Please try again.")
     } finally {
       setIsSubmitting(false)
@@ -151,10 +141,9 @@ export function RateView({
       <div className="fixed top-0 left-0 right-0 z-20" style={{ backgroundColor: "#080810" }}>
         <div className="flex items-center justify-center h-10">
           <span className="text-xs text-muted-foreground tracking-wide">
-            {showRatedHeadline 
-              ? `${displayRatedCount} response${displayRatedCount !== 1 ? 's' : ''} rated`
-              : `Response ${currentDisplayNumber} of 6`
-            }
+            {progressExpandedLabel
+              ? `Response ${localIndex + 1}`
+              : `Response ${localIndex + 1} of 6`}
           </span>
         </div>
         <div className="w-full h-0.5 bg-secondary">
@@ -298,7 +287,7 @@ export function RateView({
               <div className="flex justify-center gap-4">
                 <Button 
                   size="lg"
-                  disabled={selectedRating === null || !hasMoreResponses}
+                  disabled={selectedRating === null}
                   onClick={handleNextResponse}
                   className="px-8 py-6 text-base font-medium bg-accent text-accent-foreground hover:bg-accent/90 transition-all duration-200 shadow-lg shadow-accent/25 disabled:opacity-40 disabled:shadow-none disabled:cursor-not-allowed"
                 >
