@@ -291,7 +291,7 @@ export function RateView({
                   onClick={handleNextResponse}
                   className="px-8 py-6 text-base font-medium bg-accent text-accent-foreground hover:bg-accent/90 transition-all duration-200 shadow-lg shadow-accent/25 disabled:opacity-40 disabled:shadow-none disabled:cursor-not-allowed"
                 >
-                  Next Response
+                  Next Response ↵
                 </Button>
                 <Button 
                   size="lg"
@@ -315,7 +315,7 @@ export function RateView({
                 onClick={handleNextResponse}
                 className="px-10 py-6 text-base font-medium bg-accent text-accent-foreground hover:bg-accent/90 transition-all duration-200 shadow-lg shadow-accent/25 disabled:opacity-40 disabled:shadow-none disabled:cursor-not-allowed"
               >
-                Next Response
+                Next Response ↵
               </Button>
             )}
             

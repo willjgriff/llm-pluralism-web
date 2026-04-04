@@ -34,7 +34,7 @@ export function LandingView({ onStart }: LandingViewProps) {
 
         {/* Subheadline */}
         <p className="text-lg sm:text-xl text-[#a0a0a8] font-normal leading-relaxed mb-12 text-pretty">
-          AI models are trained to please the majority, but whose majority? Answer a few questions about your values, rate a few AI responses, and discover which model aligns with how you see the world.
+          Answer a few questions about your values, rate a few AI responses, and discover which model aligns with how you see the world. Your ratings help us understand whether AI truly works for everyone.
         </p>
 
         {/* Feature bullets */}
