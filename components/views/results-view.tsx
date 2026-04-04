@@ -157,7 +157,7 @@ ${personas}
 My AI match: ${results.best_match.model_display_name}
 Rated AI responses ${userMeanScore}/5 for reasonableness
 Find out which AI model actually understands your worldview:
-llm-pluralism.vercel.app`
+aisafetyform.up.railway.app/`
     navigator.clipboard.writeText(shareText)
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
@@ -503,7 +503,7 @@ llm-pluralism.vercel.app`
               className="text-xs mt-1"
               style={{ color: WHITE_40 }}
             >
-              llm-pluralism.vercel.app
+              aisafetyform.up.railway.app/
             </p>
           </div>
 
