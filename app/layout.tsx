@@ -11,8 +11,16 @@ export const metadata: Metadata = {
   description: 'Rate AI responses on contested topics and see how well AI performs for someone with your values.',
   generator: 'v0.app',
   icons: {
-    icon: '/favy.svg',
-    apple: '/favy.svg',
+    icon: [
+      {
+        url: '/favicon-light.svg',
+        media: '(prefers-color-scheme: light)',
+      },
+      {
+        url: '/favicon-dark.svg',
+        media: '(prefers-color-scheme: dark)',
+      },
+    ],
   },
 }
 
