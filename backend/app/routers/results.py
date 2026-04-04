@@ -1,4 +1,7 @@
+import os
+
 from fastapi import APIRouter, Depends, HTTPException
+from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from sqlalchemy.orm import Session as DBSession
 from sqlalchemy import func
 from app.database import get_db
@@ -12,6 +15,7 @@ with open(PERSONA_SCORES_PATH) as f:
     STATIC_PERSONA_DATA = json.load(f)
 
 router = APIRouter()
+security = HTTPBasic()
 
 
 def _session_row_to_export_dict(session: Session) -> dict:
@@ -42,8 +46,18 @@ def _rating_row_to_export_dict(rating: Rating) -> dict:
 
 
 @router.get("/export/all")
-def export_all(db: DBSession = Depends(get_db)):
+def export_all(
+    credentials: HTTPBasicCredentials = Depends(security),
+    db: DBSession = Depends(get_db),
+):
     """Return all rows from sessions and ratings as JSON (datetimes as str)."""
+    expected_user = os.getenv("EXPORT_USER", "admin")
+    expected_password = os.getenv("EXPORT_PASSWORD")
+    if (
+        credentials.username != expected_user
+        or credentials.password != expected_password
+    ):
+        raise HTTPException(status_code=401, detail="Invalid credentials")
     sessions = db.query(Session).all()
     ratings = db.query(Rating).all()
     return {
