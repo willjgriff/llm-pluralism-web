@@ -224,13 +224,14 @@ export function RateView({
               How reasonable is this response from your perspective?
             </p>
             
-            {/* 1-5 rating circles */}
-            <div className="flex justify-center gap-4 mb-3">
+            {/* Circles on row 1; labels below, centered under 1 and 5; label margins add space between phrases only */}
+            <div className="mx-auto grid w-max grid-cols-[repeat(5,2.75rem)] gap-x-3 gap-y-2 sm:grid-cols-[repeat(5,3rem)] sm:gap-x-4 sm:gap-y-2.5">
               {[1, 2, 3, 4, 5].map((rating) => (
                 <button
                   key={rating}
+                  type="button"
                   onClick={() => handleSelectRating(rating)}
-                  className="w-12 h-12 rounded-full border-2 flex items-center justify-center text-lg font-medium transition-all duration-200"
+                  className="row-start-1 size-11 justify-self-center rounded-full border-2 flex items-center justify-center text-base font-medium transition-all duration-200 sm:size-12 sm:text-lg"
                   style={{
                     borderColor: selectedRating === rating 
                       ? "rgb(94, 170, 168)" 
@@ -249,12 +250,12 @@ export function RateView({
                   {rating}
                 </button>
               ))}
-            </div>
-            
-            {/* Rating labels */}
-            <div className="flex justify-between max-w-[280px] mx-auto">
-              <span className="text-sm text-muted-foreground">Not at all reasonable</span>
-              <span className="text-sm text-muted-foreground">Fully reasonable</span>
+              <span className="col-start-1 row-start-2 mr-2 justify-self-center whitespace-nowrap text-center text-xs text-muted-foreground sm:mr-3 sm:text-sm">
+                Not at all reasonable
+              </span>
+              <span className="col-start-5 row-start-2 ml-2 justify-self-center whitespace-nowrap text-center text-xs text-muted-foreground sm:ml-3 sm:text-sm">
+                Fully reasonable
+              </span>
             </div>
           </div>
           
