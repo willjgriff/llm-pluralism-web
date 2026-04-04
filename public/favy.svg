@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg"
+     viewBox="100 120 360 320">
+
+  <!-- Triangle lines -->
+  <g stroke="#000"
+     stroke-width="14"
+     stroke-linecap="round"
+     stroke-linejoin="round"
+     fill="none">
+
+    <line x1="150" y1="370" x2="325" y2="165"/>
+    <line x1="325" y1="165" x2="420" y2="372"/>
+    <line x1="150" y1="370" x2="420" y2="372"/>
+
+  </g>
+
+  <!-- Larger nodes -->
+  <g fill="#000">
+
+    <circle cx="150" cy="370" r="32"/>
+    <circle cx="325" cy="165" r="32"/>
+    <circle cx="420" cy="372" r="32"/>
+
+  </g>
+
+</svg>
