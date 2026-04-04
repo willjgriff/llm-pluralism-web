@@ -29,7 +29,6 @@ export default function Home() {
   const [isTransitioning, setIsTransitioning] = useState(false)
   const [displayedView, setDisplayedView] = useState<View>("landing")
   const [appState, setAppState] = useState<AppState>(INITIAL_STATE)
-  const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
@@ -56,7 +55,6 @@ export default function Home() {
   }
 
   const handleQuestionnaireComplete = async (answers: number[]) => {
-    setIsLoading(true)
     setError(null)
     try {
       const isRepeat = !!localStorage.getItem("llm_pluralism_completed")
@@ -77,8 +75,6 @@ export default function Home() {
       handleNavigate("profile")
     } catch (err) {
       setError("Couldn't connect to the server. Please try again.")
-    } finally {
-      setIsLoading(false)
     }
   }
 
@@ -106,7 +102,6 @@ export default function Home() {
 
   const handleViewResults = async () => {
     if (!appState.sessionId) return
-    setIsLoading(true)
     setError(null)
     try {
       const results = await getResults(appState.sessionId)
@@ -115,8 +110,6 @@ export default function Home() {
       handleNavigate("results")
     } catch (err) {
       setError("Couldn't load your results. Please try again.")
-    } finally {
-      setIsLoading(false)
     }
   }
 
@@ -160,7 +153,6 @@ export default function Home() {
         {displayedView === "questionnaire" && (
           <QuestionnaireView
             onComplete={handleQuestionnaireComplete}
-            isLoading={isLoading}
             error={error}
             onClearError={() => setError(null)}
           />
@@ -178,7 +170,6 @@ export default function Home() {
             onRatingSubmit={handleRatingSubmit}
             onViewResults={handleViewResults}
             onGetMoreResponses={handleGetMoreResponses}
-            isLoading={isLoading}
             error={error}
             onClearError={() => setError(null)}
           />

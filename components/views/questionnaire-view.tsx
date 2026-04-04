@@ -16,12 +16,11 @@ const questions = [
 
 interface QuestionnaireViewProps {
   onComplete: (answers: number[]) => void
-  isLoading?: boolean
   error?: string | null
   onClearError?: () => void
 }
 
-export function QuestionnaireView({ onComplete, isLoading, error, onClearError }: QuestionnaireViewProps) {
+export function QuestionnaireView({ onComplete, error, onClearError }: QuestionnaireViewProps) {
   const [answers, setAnswers] = useState<Record<number, number>>({})
   
   const answeredCount = Object.keys(answers).length
@@ -92,11 +91,11 @@ export function QuestionnaireView({ onComplete, isLoading, error, onClearError }
         <div className="mt-10 text-center">
           <Button 
             size="lg"
-            disabled={!allAnswered || isLoading}
+            disabled={!allAnswered}
             onClick={handleContinue}
             className="px-10 py-6 text-base font-medium bg-accent text-accent-foreground hover:bg-accent/90 transition-all duration-200 shadow-lg shadow-accent/25 disabled:opacity-40 disabled:shadow-none disabled:cursor-not-allowed"
           >
-            {isLoading ? "Connecting..." : "Continue"}
+            Continue
           </Button>
           {error && (
             <div className="mt-4 flex items-center justify-center gap-3">

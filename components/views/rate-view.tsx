@@ -10,7 +10,6 @@ interface RateViewProps {
   onRatingSubmit: (rating: Rating) => Promise<void>
   onViewResults: () => void
   onGetMoreResponses: () => void
-  isLoading?: boolean
   error?: string | null
   onClearError?: () => void
 }
@@ -21,7 +20,6 @@ export function RateView({
   onRatingSubmit,
   onViewResults,
   onGetMoreResponses,
-  isLoading,
   error,
   onClearError,
 }: RateViewProps) {
@@ -297,7 +295,6 @@ export function RateView({
                   size="lg"
                   variant="outline"
                   onClick={handleSeeResults}
-                  disabled={isLoading}
                   className="px-8 py-6 text-base font-medium transition-all duration-200"
                   style={{
                     borderColor: "rgb(94, 170, 168)",
@@ -305,7 +302,7 @@ export function RateView({
                     backgroundColor: "transparent"
                   }}
                 >
-                  {isLoading ? "Loading results..." : "See My Results"}
+                  See My Results
                 </Button>
               </div>
             ) : (
