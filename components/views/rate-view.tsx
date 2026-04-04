@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import { CornerDownLeft } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { AIResponse, Rating } from "@/lib/types"
 
@@ -39,7 +40,8 @@ export function RateView({
     if (localIndex >= 6) setProgressExpandedLabel(true)
   }, [localIndex])
 
-  const progressPercent = Math.min((ratingsCount / 6) * 100, 100)
+  /** Tracks the current response slot (0-based), so the bar moves when navigating back/forward, not only when ratings are saved. */
+  const progressPercent = Math.min((localIndex / 6) * 100, 100)
 
   const handleSelectRating = (rating: number) => {
     if (!currentResponse) return
@@ -289,7 +291,12 @@ export function RateView({
                   onClick={handleNextResponse}
                   className="px-8 py-6 text-base font-medium bg-accent text-accent-foreground hover:bg-accent/90 transition-all duration-200 shadow-lg shadow-accent/25 disabled:opacity-40 disabled:shadow-none disabled:cursor-not-allowed"
                 >
-                  Next Response ↵
+                  Next Response
+                  <CornerDownLeft
+                    className="size-[1rem] shrink-0"
+                    aria-hidden
+                    strokeWidth={2.25}
+                  />
                 </Button>
                 <Button 
                   size="lg"
@@ -312,7 +319,12 @@ export function RateView({
                 onClick={handleNextResponse}
                 className="px-10 py-6 text-base font-medium bg-accent text-accent-foreground hover:bg-accent/90 transition-all duration-200 shadow-lg shadow-accent/25 disabled:opacity-40 disabled:shadow-none disabled:cursor-not-allowed"
               >
-                Next Response ↵
+                Next Response
+                <CornerDownLeft
+                  className="size-[1rem] shrink-0"
+                  aria-hidden
+                  strokeWidth={2.25}
+                />
               </Button>
             )}
             
