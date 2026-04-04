@@ -320,6 +320,12 @@ llm-pluralism.vercel.app`
           >
             How your score compares
           </h3>
+          <p
+            className="text-center text-sm mb-3"
+            style={{ color: WHITE_55 }}
+          >
+            Average reasonableness rating given to AI responses, grouped by value perspective
+          </p>
           {!results.use_live_data && (
             <p
               className="text-sm text-center mb-8"
