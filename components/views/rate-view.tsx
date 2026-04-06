@@ -10,7 +10,7 @@ interface RateViewProps {
   ratingsCount: number
   onRatingSubmit: (rating: Rating) => Promise<void>
   onViewResults: () => void
-  onGetMoreResponses: () => void
+  onGetMoreResponses: () => Promise<boolean>
   error?: string | null
   onClearError?: () => void
 }
@@ -28,17 +28,50 @@ export function RateView({
   const [feedback, setFeedback] = useState("")
   const [localIndex, setLocalIndex] = useState(0)
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isPrefetching, setIsPrefetching] = useState(false)
   const [ratingError, setRatingError] = useState<string | null>(null)
+  const [hasNoMoreResponses, setHasNoMoreResponses] = useState(false)
+  const [prefetchedResponseCount, setPrefetchedResponseCount] = useState(0)
   /** After the user reaches response 7 (index 6), progress text drops "of 6" and stays that way even if they go back. */
   const [progressExpandedLabel, setProgressExpandedLabel] = useState(false)
 
   const currentResponse = responses[localIndex] ?? null
   const selectedRating = localRatings[localIndex] ?? null
   const canSeeResults = ratingsCount >= 6
+  const isOnFinalResponse = localIndex >= responses.length - 1
+  const isNextResponseDisabled = (hasNoMoreResponses && isOnFinalResponse) || (isPrefetching && isOnFinalResponse)
 
   useEffect(() => {
     if (localIndex >= 6) setProgressExpandedLabel(true)
   }, [localIndex])
+
+  useEffect(() => {
+    const shouldPrefetchMoreResponses =
+      responses.length > 0 &&
+      localIndex >= responses.length - 2 &&
+      !hasNoMoreResponses &&
+      !isPrefetching &&
+      prefetchedResponseCount !== responses.length
+
+    if (!shouldPrefetchMoreResponses) return
+
+    let isCancelled = false
+    setIsPrefetching(true)
+    void (async () => {
+      const hasMoreResponses = await onGetMoreResponses()
+      if (isCancelled) {
+        setIsPrefetching(false)
+        return
+      }
+      if (!hasMoreResponses) setHasNoMoreResponses(true)
+      setPrefetchedResponseCount(responses.length)
+      setIsPrefetching(false)
+    })()
+
+    return () => {
+      isCancelled = true
+    }
+  }, [localIndex, responses.length, hasNoMoreResponses, isPrefetching, prefetchedResponseCount, onGetMoreResponses])
 
   /** Tracks the current response slot (0-based), so the bar moves when navigating back/forward, not only when ratings are saved. */
   const progressPercent = Math.min((localIndex / 6) * 100, 100)
@@ -93,7 +126,25 @@ export function RateView({
         reasoning: feedback.trim() || undefined,
       })
       if (localIndex >= responses.length - 1) {
-        await onGetMoreResponses()
+        if (isPrefetching) {
+          return
+        }
+        if (hasNoMoreResponses) {
+          if (document.activeElement instanceof HTMLElement) {
+            document.activeElement.blur()
+          }
+          setFeedback("")
+          return
+        }
+        const hasMoreResponses = await onGetMoreResponses()
+        if (!hasMoreResponses) {
+          setHasNoMoreResponses(true)
+          if (document.activeElement instanceof HTMLElement) {
+            document.activeElement.blur()
+          }
+          setFeedback("")
+          return
+        }
       }
       if (document.activeElement instanceof HTMLElement) {
         document.activeElement.blur()
@@ -116,7 +167,7 @@ export function RateView({
       const target = event.target as HTMLElement | null
       if (target && ["TEXTAREA", "INPUT", "SELECT"].includes(target.tagName)) return
       if (target?.isContentEditable) return
-      if (selectedRating === null || isSubmitting) return
+      if (isNextResponseDisabled || isSubmitting) return
       if (event.key === "Enter" || event.key === " ") {
         event.preventDefault()
         void handleNextResponse()
@@ -125,7 +176,7 @@ export function RateView({
 
     window.addEventListener("keydown", handleKeyDown)
     return () => window.removeEventListener("keydown", handleKeyDown)
-  }, [selectedRating, isSubmitting, currentResponse, localIndex, responses.length, feedback])
+  }, [isNextResponseDisabled, isSubmitting, selectedRating, currentResponse, localIndex, responses.length, feedback])
 
   if (!currentResponse) {
     return (
@@ -288,7 +339,7 @@ export function RateView({
               <div className="flex justify-center gap-4">
                 <Button 
                   size="lg"
-                  disabled={selectedRating === null}
+                  disabled={isNextResponseDisabled}
                   onClick={handleNextResponse}
                   className="px-8 py-6 text-base font-medium bg-accent text-accent-foreground hover:bg-accent/90 transition-all duration-200 shadow-lg shadow-accent/25 disabled:opacity-40 disabled:shadow-none disabled:cursor-not-allowed"
                 >
@@ -316,7 +367,7 @@ export function RateView({
             ) : (
               <Button 
                 size="lg"
-                disabled={selectedRating === null}
+                disabled={isNextResponseDisabled}
                 onClick={handleNextResponse}
                 className="px-10 py-6 text-base font-medium bg-accent text-accent-foreground hover:bg-accent/90 transition-all duration-200 shadow-lg shadow-accent/25 disabled:opacity-40 disabled:shadow-none disabled:cursor-not-allowed"
               >
@@ -330,9 +381,14 @@ export function RateView({
             )}
             
             {/* Encouragement text - only show after initial 6 responses */}
-            {localIndex >= 6 && (
+            {localIndex >= 6 && !hasNoMoreResponses && (
               <p className="text-xs text-muted-foreground italic mt-4">
                 More responses = a more accurate AI match and better research data
+              </p>
+            )}
+            {hasNoMoreResponses && (
+              <p className="text-xs text-muted-foreground italic mt-4">
+                You have rated all available responses for this session.
               </p>
             )}
             {error && (

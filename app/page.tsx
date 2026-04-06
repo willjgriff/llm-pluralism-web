@@ -113,19 +113,22 @@ export default function Home() {
     }
   }
 
-  const handleGetMoreResponses = async () => {
-    if (!appState.sessionId) return
+  const handleGetMoreResponses = async (): Promise<boolean> => {
+    if (!appState.sessionId) return false
     try {
       const more = await getMoreResponses(appState.sessionId, appState.seenResponseKeys)
+      if (more.length === 0) return false
       const newKeys = more.map((r: AIResponse) => `${r.question_id}:${r.model}`)
       setAppState(prev => ({
         ...prev,
         responses: [...prev.responses, ...more],
         seenResponseKeys: [...prev.seenResponseKeys, ...newKeys],
       }))
+      return true
     } catch (err) {
       // Fail silently — user can still see results
       console.error("Failed to load more responses:", err)
+      return false
     }
   }
 

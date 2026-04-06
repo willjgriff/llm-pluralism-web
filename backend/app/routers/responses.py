@@ -9,6 +9,7 @@ from app.database import get_db
 router = APIRouter()
 
 RESPONSES_PATH = Path(__file__).parent.parent / "data" / "exported_AI_responses.json"
+MAX_RATEABLE_RESPONSES = 7
 
 class MoreResponsesRequest(BaseModel):
     session_id: str
@@ -16,14 +17,19 @@ class MoreResponsesRequest(BaseModel):
 
 @router.post("/responses/more")
 def get_more_responses(request: MoreResponsesRequest, db: DBSession = Depends(get_db)):
+    seen_response_keys = set(request.seen_response_keys)
+    if len(seen_response_keys) >= MAX_RATEABLE_RESPONSES:
+        return []
+
     with open(RESPONSES_PATH) as f:
         all_responses = json.load(f)
 
     unseen = [
         r for r in all_responses
-        if f"{r['question_id']}:{r['model']}" not in request.seen_response_keys
+        if f"{r['question_id']}:{r['model']}" not in seen_response_keys
     ]
 
-    selected = random.sample(unseen, min(6, len(unseen)))
+    remaining_responses = MAX_RATEABLE_RESPONSES - len(seen_response_keys)
+    selected = random.sample(unseen, min(6, len(unseen), remaining_responses))
     random.shuffle(selected)
     return selected

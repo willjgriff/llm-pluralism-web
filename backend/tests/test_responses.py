@@ -51,20 +51,19 @@ def test_more_responses_no_duplicates_within_batch(client):
     keys = [response_key(r) for r in response.json()]
     assert len(keys) == len(set(keys))
 
-def test_more_responses_returns_fewer_when_pool_exhausted(client):
+def test_more_responses_returns_empty_when_max_seen_reached(client):
     session_id, _ = create_session(client)
     responses_path = Path(__file__).parent.parent / "app" / "data" / "exported_AI_responses.json"
     with open(responses_path) as f:
         all_responses = json.load(f)
     all_keys = [response_key(r) for r in all_responses]
-    leave_out = all_keys[:3]
-    seen_keys = [k for k in all_keys if k not in leave_out]
+    seen_keys = all_keys[:30]
     response = client.post("/responses/more", json={
         "session_id": session_id,
         "seen_response_keys": seen_keys,
     })
     assert response.status_code == 200
-    assert len(response.json()) == 3
+    assert len(response.json()) == 0
 
 def test_more_responses_returns_empty_when_all_seen(client):
     session_id, _ = create_session(client)
