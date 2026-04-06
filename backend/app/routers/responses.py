@@ -8,7 +8,7 @@ from app.database import get_db
 
 router = APIRouter()
 
-RESPONSES_PATH = Path(__file__).parent.parent / "data" / "exported_AI_responses.json"
+RESPONSES_PATH = Path(__file__).parent.parent / "data" / "web_formatted_responses.json"
 MAX_RATEABLE_RESPONSES = 30
 
 class MoreResponsesRequest(BaseModel):

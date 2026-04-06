@@ -53,7 +53,7 @@ def test_more_responses_no_duplicates_within_batch(client):
 
 def test_more_responses_returns_empty_when_max_seen_reached(client):
     session_id, _ = create_session(client)
-    responses_path = Path(__file__).parent.parent / "app" / "data" / "exported_AI_responses.json"
+    responses_path = Path(__file__).parent.parent / "app" / "data" / "web_formatted_responses.json"
     with open(responses_path) as f:
         all_responses = json.load(f)
     all_keys = [response_key(r) for r in all_responses]
@@ -67,7 +67,7 @@ def test_more_responses_returns_empty_when_max_seen_reached(client):
 
 def test_more_responses_returns_empty_when_all_seen(client):
     session_id, _ = create_session(client)
-    responses_path = Path(__file__).parent.parent / "app" / "data" / "exported_AI_responses.json"
+    responses_path = Path(__file__).parent.parent / "app" / "data" / "web_formatted_responses.json"
     with open(responses_path) as f:
         all_responses = json.load(f)
     all_keys = [response_key(r) for r in all_responses]
