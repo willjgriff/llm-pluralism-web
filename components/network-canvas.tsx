@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useRef } from "react"
+import { useEffect, useRef, useState } from "react"
 
 interface Node {
   x: number
@@ -18,8 +18,19 @@ export function NetworkCanvas({ exclusionWidth = 700, exclusionHeight = 600 }: N
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const nodesRef = useRef<Node[]>([])
   const animationRef = useRef<number>(0)
+  const [isSmallScreen, setIsSmallScreen] = useState(false)
 
   useEffect(() => {
+    const handleResize = () => {
+      setIsSmallScreen(window.innerWidth < 640)
+    }
+    handleResize()
+    window.addEventListener("resize", handleResize)
+    return () => window.removeEventListener("resize", handleResize)
+  }, [])
+
+  useEffect(() => {
+    if (isSmallScreen) return
     const canvas = canvasRef.current
     if (!canvas) return
 
@@ -160,7 +171,9 @@ export function NetworkCanvas({ exclusionWidth = 700, exclusionHeight = 600 }: N
       window.removeEventListener("resize", resizeCanvas)
       cancelAnimationFrame(animationRef.current)
     }
-  }, [exclusionWidth, exclusionHeight])
+  }, [exclusionWidth, exclusionHeight, isSmallScreen])
+
+  if (isSmallScreen) return null
 
   return (
     <canvas
