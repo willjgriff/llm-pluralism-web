@@ -62,7 +62,7 @@ A society axis (Religious vs Secularist) is included in the questionnaire for da
 
 ## Response selection
 
-Each participant receives 6 responses selected from `questions_ordered.json` based on their questionnaire profile.
+Each participant receives 6 responses selected from `responses_ordered.json` based on their questionnaire profile.
 
 **Profile determination** — the participant's 8 questionnaire answers are reduced to four axis scores (economic, identity, technology, society). The dominant axis by absolute score becomes their primary axis. Scores below 2 on all axes are treated as centrist.
 
@@ -77,7 +77,7 @@ The selection always enforces:
 
 When a participant requests more responses, the same process applies while excluding already-seen question IDs.
 
-Bridging scores and discriminated (std) values are precomputed from the llm-pluralism evaluation pipeline and stored in `questions_ordered.json`.
+Bridging scores and discriminated (std) values are precomputed from the llm-pluralism evaluation pipeline and stored in `responses_ordered.json`.
 
 ---
 

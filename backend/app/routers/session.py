@@ -9,7 +9,7 @@ from app.models.database import Session
 
 router = APIRouter()
 
-QUESTIONS_ORDERED_PATH = Path(__file__).parent.parent / "data" / "questions_ordered.json"
+RESPONSES_ORDERED_PATH = Path(__file__).parent.parent / "data" / "responses_ordered.json"
 
 AXIS_QUESTIONS = {
     "economic": [1, 2, 3, 4, 5, 6],
@@ -84,7 +84,7 @@ def _question_key(response: dict) -> int:
 
 
 def _normalize_response(response: dict) -> dict:
-    """Maps ordered-question rows to the API response contract."""
+    """Maps rows from the ordered response source file to the API response contract."""
     return {
         "question_id": response["question_id"],
         "group_id": response.get("group_id"),
@@ -96,16 +96,16 @@ def _normalize_response(response: dict) -> dict:
     }
 
 
-def _load_questions_ordered() -> dict:
+def _load_responses_ordered() -> dict:
     """Loads the axis-ordered response source file."""
-    with open(QUESTIONS_ORDERED_PATH) as file:
+    with open(RESPONSES_ORDERED_PATH) as file:
         return json.load(file)
 
 
-def _collect_all_unique_responses(questions_ordered: dict) -> list[dict]:
+def _collect_all_unique_responses(responses_ordered: dict) -> list[dict]:
     """Builds a unique list of responses from all axis ranking lists."""
     unique = {}
-    for axis_data in questions_ordered.values():
+    for axis_data in responses_ordered.values():
         for list_key in ("ordered_by_std", "ordered_by_bridging_score"):
             for response in axis_data[list_key]:
                 unique[_response_key(response)] = response
@@ -183,9 +183,9 @@ def _fill_random(
 def select_responses(primary_axis: str, seen_question_ids: set[int] | None = None) -> list[dict]:
     """Selects six responses with axis-aware weighting and global constraints."""
     seen_question_ids = seen_question_ids or set()
-    questions_ordered = _load_questions_ordered()
-    all_responses = _collect_all_unique_responses(questions_ordered)
-    axis_data = questions_ordered.get(primary_axis)
+    responses_ordered = _load_responses_ordered()
+    all_responses = _collect_all_unique_responses(responses_ordered)
+    axis_data = responses_ordered.get(primary_axis)
 
     selected_question_ids = set(seen_question_ids)
     selected_response_keys = set()

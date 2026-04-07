@@ -53,7 +53,7 @@ def test_more_responses_no_duplicates_within_batch(client):
 
 def test_more_responses_uses_question_level_seen_ids(client):
     session_id, _ = create_session(client)
-    responses_path = Path(__file__).parent.parent / "app" / "data" / "questions_ordered.json"
+    responses_path = Path(__file__).parent.parent / "app" / "data" / "responses_ordered.json"
     with open(responses_path) as f:
         ordered = json.load(f)
     all_question_ids = set()
@@ -71,7 +71,7 @@ def test_more_responses_uses_question_level_seen_ids(client):
 
 def test_more_responses_returns_empty_when_all_seen(client):
     session_id, _ = create_session(client)
-    responses_path = Path(__file__).parent.parent / "app" / "data" / "questions_ordered.json"
+    responses_path = Path(__file__).parent.parent / "app" / "data" / "responses_ordered.json"
     with open(responses_path) as f:
         ordered = json.load(f)
     all_question_ids = set()

@@ -1,4 +1,4 @@
-"""Unit tests for the current questions_ordered-based response selection."""
+"""Unit tests for the current responses_ordered-based response selection."""
 
 from app.routers.session import MODELS, select_responses
 
