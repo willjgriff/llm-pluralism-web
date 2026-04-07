@@ -43,9 +43,7 @@ Participants answer 6 questionnaire questions mapped to 4 opposing axis pairs:
 | Economic | Govt should reduce inequality through taxation | Individuals should keep wealth with minimal redistribution | Collectivist | Libertarian |
 | Identity | Nations have primary duty to own citizens | Open borders broadly good for humanity | Globalist | Nationalist |
 | Technology | AI development should be slowed | Benefits of tech outweigh risks | Tech Sceptic | Tech Optimist |
-
-
-| Society | Religion not active in society | Public life guided by secular values | Religious | Secularist |
+| Society | Religion should be active in society | Public life should be guided by secular values | Religious | Secularist |
 
 Axis scores are computed as:
 
