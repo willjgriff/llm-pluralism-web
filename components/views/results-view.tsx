@@ -156,8 +156,8 @@ export function ResultsView({ results, personaProfile, onReset }: ResultsViewPro
 ${personas}
 My AI match: ${results.best_match.model_display_name}
 Rated AI responses ${userMeanScore}/5 for reasonableness
-Find out which AI model actually understands your worldview:
-aisafetyform.up.railway.app/`
+Find out which AI model understands your worldview:
+https://makesafeai.org/`
     navigator.clipboard.writeText(shareText)
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
@@ -497,13 +497,13 @@ aisafetyform.up.railway.app/`
               className="text-sm mt-2"
               style={{ color: WHITE_90 }}
             >
-              Find out which AI model actually understands your worldview:
+              Find out which AI model understands your worldview:
             </p>
             <p 
               className="text-xs mt-1"
               style={{ color: WHITE_40 }}
             >
-              aisafetyform.up.railway.app/
+              https://makesafeai.org/
             </p>
           </div>
 
