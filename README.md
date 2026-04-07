@@ -62,23 +62,22 @@ A society axis (Religious vs Secularist) is included in the questionnaire for da
 
 ## Response selection
 
-Each session receives 6 responses selected using a three-pool stratified strategy that balances validation quality with topic relevance.
+Each participant receives 6 responses selected from `questions_ordered.json` based on their questionnaire profile.
 
-**Relevance weighting** — each response is weighted by how relevant it is to the participant's value profile. Relevance is the absolute axis score for the axis that response's question belongs to. A participant with a strong economic score (abs = 4) will see more economic axis responses than technology axis responses (abs = 1).
+**Profile determination** — the participant's 8 questionnaire answers are reduced to four axis scores (economic, identity, technology, society). The dominant axis by absolute score becomes their primary axis. Scores below 2 on all axes are treated as centrist.
 
-Cultural and religious values responses (questions 7, 8, 9) are excluded from the relevance-weighted pools because their AI bridging scores are artificially inflated. The Religious and Secularist personas were excluded from those calculations, making those responses appear more pluralistic than they may actually be. They remain eligible for the random pool.
+**For non-centrist participants**, 2 responses are drawn from each of two pre-ranked lists for their primary axis: one ordered by bridging score (responses with highest pluralistic acceptability across personas) and one ordered by discriminativeness (responses where personas disagreed most sharply). The top 6 items from each list are weighted 5, 4, 3, 2, 1, 1 for sampling. The candidate pool expands beyond the top 6 if needed to satisfy the enforcement constraints below. Then 2 more at random are selected.
 
-**Pool 1 — 2 highest bridging score responses** from the participant's relevant response set. These are responses where the AI evaluation found the highest pluralistic acceptability across value-diverse personas. Showing these to human participants tests whether humans agree with the AI evaluation's assessment of what constitutes a genuinely bridging response.
+**For centrist participants**, all responses are drawn from the global pool directly at random.
 
-**Pool 2 — 2 highest discriminativeness responses** from the relevant response set not already selected. These are responses where AI personas disagreed most sharply, they had high standard deviation across persona scores. Showing these to human participants tests whether human value groups disagree in the same direction that AI personas disagree, which is the core validation question.
+The selection always enforces:
+- exactly 6 responses per batch
+- no repeated question IDs
+- exactly 2 responses per model (Claude 3.5 Haiku, GPT-4.1 Mini, Grok 4 Fast)
 
-**Pool 3 — 2 random responses** from all remaining unseen responses across all axes. This ensures the full response set is eventually covered and prevents systematic bias toward only high-scoring responses.
+When a participant requests more responses, the same process applies while excluding already-seen question IDs.
 
-A model diversity constraint ensures all three evaluated models (Claude 3.5 Haiku, GPT-4.1 Mini, Grok 4 Fast) are represented across the 6 responses, giving participants a basis for comparison across models on the results page.
-
-When a participant requests more than 6 responses the same three-pool strategy is applied to the remaining unseen responses using the participant's stored axis scores.
-
-Bridging scores and discriminativeness values are precomputed from the llm-pluralism evaluation pipeline and stored in `backend/app/data/question_score_discriminated.json`.
+Bridging scores and discriminated (std) values are precomputed from the llm-pluralism evaluation pipeline and stored in `questions_ordered.json`.
 
 ---
 
