@@ -51,7 +51,7 @@ Axis scores are computed as:
 economic_score   = answers[1] - answers[0]
 identity_score   = answers[2] - answers[3]
 technology_score = answers[5] - answers[4]
-society_score    = answers[6] - answers[7]
+society_score    = answers[7] - answers[6]
 ```
 
 The primary persona is assigned based on the axis with the highest absolute score. If no axis exceeds a threshold of 2 the participant is assigned Centrist. In the case of a tie the first axis in list order (economic) wins.
