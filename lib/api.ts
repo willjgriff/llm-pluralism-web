@@ -27,11 +27,11 @@ export async function getResults(sessionId: string): Promise<Results> {
   return res.json()
 }
 
-export async function getMoreResponses(sessionId: string, seenKeys: string[]): Promise<AIResponse[]> {
+export async function getMoreResponses(sessionId: string, seenQuestionIds: number[]): Promise<AIResponse[]> {
   const res = await fetch(`${API_URL}/responses/more`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ session_id: sessionId, seen_response_keys: seenKeys }),
+    body: JSON.stringify({ session_id: sessionId, seen_question_ids: seenQuestionIds }),
   })
   if (!res.ok) throw new Error('Failed to get more responses')
   return res.json()

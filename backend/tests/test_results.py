@@ -23,8 +23,8 @@ def submit_rating(client, session_id, question_id, model, score):
         "score": score,
     })
 
-def create_session_with_ratings(client, scores_by_model, is_repeat=False):
-    session_id = create_session(client, is_repeat=is_repeat)
+def create_session_with_ratings(client, scores_by_model, is_repeat=False, answers=None):
+    session_id = create_session(client, answers=answers, is_repeat=is_repeat)
     question_id = 1
     for model, scores in scores_by_model.items():
         for score in scores:
@@ -142,17 +142,37 @@ def test_repeat_sessions_excluded_from_participant_count(client):
     assert data["total_participants"] == 1
 
 def test_use_live_data_true_at_threshold(client):
-    for _ in range(20):
-        create_session_with_ratings(client, {
+    persona_answer_profiles = [
+        [4, 2, 3, 3, 3, 3, 3, 3],
+        [1, 5, 3, 3, 3, 3, 3, 3],
+        [3, 3, 5, 1, 3, 3, 3, 3],
+        [3, 3, 1, 5, 3, 3, 3, 3],
+        [3, 3, 3, 3, 1, 5, 3, 3],
+        [3, 3, 3, 3, 5, 1, 3, 3],
+        [3, 3, 3, 3, 3, 3, 5, 1],
+        [3, 3, 3, 3, 3, 3, 1, 5],
+    ]
+    for _ in range(3):
+        for answers in persona_answer_profiles:
+            create_session_with_ratings(
+                client,
+                {
+                    MODELS[0]: [4, 5],
+                    MODELS[1]: [3, 3],
+                    MODELS[2]: [2, 1],
+                },
+                is_repeat=False,
+                answers=answers,
+            )
+    session_id = create_session_with_ratings(
+        client,
+        {
             MODELS[0]: [4, 5],
             MODELS[1]: [3, 3],
             MODELS[2]: [2, 1],
-        }, is_repeat=False)
-    session_id = create_session_with_ratings(client, {
-        MODELS[0]: [4, 5],
-        MODELS[1]: [3, 3],
-        MODELS[2]: [2, 1],
-    })
+        },
+        answers=VALID_ANSWERS,
+    )
     response = client.get(f"/results/{session_id}")
     data = response.json()
     assert data["use_live_data"] == True

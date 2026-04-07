@@ -21,9 +21,9 @@ export interface PersonaProfile {
 
 export interface AIResponse {
   question_id: number
-  group: string
+  group_id: number
   group_name: string
-  prompt: string
+  prompt_text: string
   model: string
   model_display_name: string
   response_text: string
@@ -68,7 +68,7 @@ export interface AppState {
   answers: number[]
   personaProfile: PersonaProfile | null
   responses: AIResponse[]
-  seenResponseKeys: string[]
+  seenQuestionIds: number[]
   ratings: Rating[]
   results: Results | null
   isRepeatSession: boolean

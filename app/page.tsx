@@ -18,7 +18,7 @@ const INITIAL_STATE: AppState = {
   answers: [],
   personaProfile: null,
   responses: [],
-  seenResponseKeys: [],
+  seenQuestionIds: [],
   ratings: [],
   results: null,
   isRepeatSession: false,
@@ -60,16 +60,14 @@ export default function Home() {
       const isRepeat = !!localStorage.getItem("llm_pluralism_completed")
       const personaProfile = assignPersonas(answers)
       const sessionResponse = await createSession(answers, isRepeat)
-      const seenKeys = sessionResponse.responses.map(
-        (r: AIResponse) => `${r.question_id}:${r.model}`
-      )
+      const seenQuestionIds = sessionResponse.responses.map((r: AIResponse) => r.question_id)
       setAppState(prev => ({
         ...prev,
         answers,
         personaProfile,
         sessionId: sessionResponse.session_id,
         responses: sessionResponse.responses,
-        seenResponseKeys: seenKeys,
+        seenQuestionIds: seenQuestionIds,
         isRepeatSession: isRepeat,
       }))
       handleNavigate("profile")
@@ -116,13 +114,13 @@ export default function Home() {
   const handleGetMoreResponses = async (): Promise<boolean> => {
     if (!appState.sessionId) return false
     try {
-      const more = await getMoreResponses(appState.sessionId, appState.seenResponseKeys)
+      const more = await getMoreResponses(appState.sessionId, appState.seenQuestionIds)
       if (more.length === 0) return false
-      const newKeys = more.map((r: AIResponse) => `${r.question_id}:${r.model}`)
+      const newQuestionIds = more.map((r: AIResponse) => r.question_id)
       setAppState(prev => ({
         ...prev,
         responses: [...prev.responses, ...more],
-        seenResponseKeys: [...prev.seenResponseKeys, ...newKeys],
+        seenQuestionIds: [...prev.seenQuestionIds, ...newQuestionIds],
       }))
       return true
     } catch (err) {

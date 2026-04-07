@@ -246,7 +246,7 @@ export function RateView({
               The question:
             </span>
             <p className="text-foreground text-lg font-medium leading-relaxed">
-              {currentResponse.prompt}
+              {currentResponse.prompt_text}
             </p>
           </div>
           
