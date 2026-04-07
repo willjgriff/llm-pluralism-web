@@ -29,6 +29,9 @@ Backend runs at:
 
 Environment variables:
 - Copy `backend/.env.example` to `backend/.env` (or otherwise set `DATABASE_URL` and `FRONTEND_URL`).
+- Optional: `SURVEY_TRUSTED_TOKEN` — if set, links with `?t=<that value>` store `traffic_source=trusted` on the session. Public sources use `?src=` with values allowlisted in `backend/app/traffic_source.py`.
+
+Frontend: toggle stripping `src` / `t` from the address bar after capture in `lib/traffic-attribution.ts` (`STRIP_TRAFFIC_PARAMS_FROM_URL`).
 
 ## Tests (backend)
 

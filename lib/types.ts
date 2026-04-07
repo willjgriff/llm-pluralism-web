@@ -36,6 +36,12 @@ export interface Rating {
   reasoning?: string
 }
 
+/** Optional values captured from `?src=` and `?t=` for traffic attribution. */
+export interface TrafficAttribution {
+  src?: string
+  trustedToken?: string
+}
+
 export interface SessionResponse {
   session_id: string
   responses: AIResponse[]

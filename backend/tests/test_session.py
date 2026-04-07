@@ -73,3 +73,42 @@ def test_response_has_required_fields(client):
         assert "model_display_name" in r
         assert "response_text" in r
 
+
+def test_allowlisted_src_stored_on_session(client, db_session):
+    response = client.post(
+        "/session",
+        json={"answers": VALID_ANSWERS, "is_repeat": False, "src": "x"},
+    )
+    assert response.status_code == 200
+    session_id = response.json()["session_id"]
+    row = db_session.query(SessionRow).filter(SessionRow.id == session_id).one()
+    assert row.traffic_source == "x"
+
+
+def test_unknown_src_stored_as_null(client, db_session):
+    response = client.post(
+        "/session",
+        json={"answers": VALID_ANSWERS, "is_repeat": False, "src": "fake_channel"},
+    )
+    assert response.status_code == 200
+    session_id = response.json()["session_id"]
+    row = db_session.query(SessionRow).filter(SessionRow.id == session_id).one()
+    assert row.traffic_source is None
+
+
+def test_trusted_token_stored_when_env_set(client, db_session, monkeypatch):
+    monkeypatch.setenv("SURVEY_TRUSTED_TOKEN", "my-shared-secret")
+    response = client.post(
+        "/session",
+        json={
+            "answers": VALID_ANSWERS,
+            "is_repeat": False,
+            "src": "x",
+            "trusted_token": "my-shared-secret",
+        },
+    )
+    assert response.status_code == 200
+    session_id = response.json()["session_id"]
+    row = db_session.query(SessionRow).filter(SessionRow.id == session_id).one()
+    assert row.traffic_source == "trusted"
+

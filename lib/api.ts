@@ -1,12 +1,19 @@
-import { Rating, Results, SessionResponse, AIResponse } from './types'
+import { Rating, Results, SessionResponse, AIResponse, TrafficAttribution } from './types'
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
 
-export async function createSession(answers: number[], isRepeat: boolean): Promise<SessionResponse> {
+export async function createSession(
+  answers: number[],
+  isRepeat: boolean,
+  traffic?: TrafficAttribution
+): Promise<SessionResponse> {
+  const body: Record<string, unknown> = { answers, is_repeat: isRepeat }
+  if (traffic?.src !== undefined) body.src = traffic.src
+  if (traffic?.trustedToken !== undefined) body.trusted_token = traffic.trustedToken
   const res = await fetch(`${API_URL}/session`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ answers, is_repeat: isRepeat }),
+    body: JSON.stringify(body),
   })
   if (!res.ok) throw new Error('Failed to create session')
   return res.json()

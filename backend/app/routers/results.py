@@ -29,6 +29,7 @@ def _session_row_to_export_dict(session: Session) -> dict:
         "identity_score": session.identity_score,
         "technology_score": session.technology_score,
         "society_score": session.society_score,
+        "traffic_source": session.traffic_source,
     }
 
 

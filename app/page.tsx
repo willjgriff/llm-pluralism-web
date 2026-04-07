@@ -9,7 +9,8 @@ import { RateView } from "@/components/views/rate-view"
 import { ResultsView } from "@/components/views/results-view"
 import { assignPersonas } from "@/lib/personas"
 import { createSession, submitRating, getResults, getMoreResponses } from "@/lib/api"
-import { AppState, Rating, AIResponse, PersonaProfile, Results } from "@/lib/types"
+import { captureTrafficAttribution, clearStoredTrafficAttribution } from "@/lib/traffic-attribution"
+import { AppState, Rating, AIResponse, PersonaProfile, Results, TrafficAttribution } from "@/lib/types"
 
 type View = "landing" | "questionnaire" | "profile" | "rate" | "results"
 
@@ -30,12 +31,17 @@ export default function Home() {
   const [displayedView, setDisplayedView] = useState<View>("landing")
   const [appState, setAppState] = useState<AppState>(INITIAL_STATE)
   const [error, setError] = useState<string | null>(null)
+  const [trafficAttribution, setTrafficAttribution] = useState<TrafficAttribution>({})
 
   useEffect(() => {
     const isRepeat = !!localStorage.getItem("llm_pluralism_completed")
     if (isRepeat) {
       setAppState(prev => ({ ...prev, isRepeatSession: true }))
     }
+  }, [])
+
+  useEffect(() => {
+    setTrafficAttribution(captureTrafficAttribution())
   }, [])
 
   const handleNavigate = (view: string) => {
@@ -59,7 +65,7 @@ export default function Home() {
     try {
       const isRepeat = !!localStorage.getItem("llm_pluralism_completed")
       const personaProfile = assignPersonas(answers)
-      const sessionResponse = await createSession(answers, isRepeat)
+      const sessionResponse = await createSession(answers, isRepeat, trafficAttribution)
       const seenQuestionIds = sessionResponse.responses.map((r: AIResponse) => r.question_id)
       setAppState(prev => ({
         ...prev,
@@ -131,6 +137,8 @@ export default function Home() {
   }
 
   const handleReset = () => {
+    clearStoredTrafficAttribution()
+    setTrafficAttribution({})
     setAppState({
       ...INITIAL_STATE,
       isRepeatSession: true,

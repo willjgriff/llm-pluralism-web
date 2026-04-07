@@ -19,6 +19,7 @@ class Session(Base):
     primary_persona = Column(String)
     primary_axis = Column(String)
     questionnaire_answers = Column(String)
+    traffic_source = Column(String, nullable=True)
 
 class Rating(Base):
     __tablename__ = "ratings"

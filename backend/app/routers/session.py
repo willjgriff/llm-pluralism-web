@@ -6,6 +6,7 @@ from pydantic import BaseModel
 from sqlalchemy.orm import Session as DBSession
 from app.database import get_db
 from app.models.database import Session
+from app.traffic_source import resolve_traffic_source
 
 router = APIRouter()
 
@@ -29,6 +30,8 @@ TOP_WEIGHTS = [5, 4, 3, 2, 1, 1]
 class SessionRequest(BaseModel):
     answers: list[int]
     is_repeat: bool = False
+    src: str | None = None
+    trusted_token: str | None = None
 
 def assign_personas(answers: list[int]) -> dict:
     economic_score = answers[1] - answers[0]
@@ -253,10 +256,15 @@ def select_responses(primary_axis: str, seen_question_ids: set[int] | None = Non
 def create_session(request: SessionRequest, db: DBSession = Depends(get_db)):
     personas = assign_personas(request.answers)
     responses = select_responses(personas["primary_axis"])
+    traffic_source = resolve_traffic_source(
+        src=request.src,
+        trusted_token=request.trusted_token,
+    )
 
     session = Session(
         is_repeat=request.is_repeat,
         questionnaire_answers=json.dumps(request.answers),
+        traffic_source=traffic_source,
         **personas,
     )
     db.add(session)
