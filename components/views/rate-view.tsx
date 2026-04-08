@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { CornerDownLeft } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { AIResponse, Rating } from "@/lib/types"
@@ -32,6 +32,7 @@ export function RateView({
   const [ratingError, setRatingError] = useState<string | null>(null)
   const [hasNoMoreResponses, setHasNoMoreResponses] = useState(false)
   const [prefetchedResponseCount, setPrefetchedResponseCount] = useState(0)
+  const isPrefetchRequestInFlight = useRef(false)
   /** After the user reaches response 7 (index 6), progress text drops "of 6" and stays that way even if they go back. */
   const [progressExpandedLabel, setProgressExpandedLabel] = useState(false)
 
@@ -50,28 +51,23 @@ export function RateView({
       responses.length > 0 &&
       localIndex >= responses.length - 2 &&
       !hasNoMoreResponses &&
-      !isPrefetching &&
       prefetchedResponseCount !== responses.length
 
-    if (!shouldPrefetchMoreResponses) return
+    if (!shouldPrefetchMoreResponses || isPrefetchRequestInFlight.current) return
 
-    let isCancelled = false
+    isPrefetchRequestInFlight.current = true
     setIsPrefetching(true)
     void (async () => {
-      const hasMoreResponses = await onGetMoreResponses()
-      if (isCancelled) {
+      try {
+        const hasMoreResponses = await onGetMoreResponses()
+        if (!hasMoreResponses) setHasNoMoreResponses(true)
+        setPrefetchedResponseCount(responses.length)
+      } finally {
+        isPrefetchRequestInFlight.current = false
         setIsPrefetching(false)
-        return
       }
-      if (!hasMoreResponses) setHasNoMoreResponses(true)
-      setPrefetchedResponseCount(responses.length)
-      setIsPrefetching(false)
     })()
-
-    return () => {
-      isCancelled = true
-    }
-  }, [localIndex, responses.length, hasNoMoreResponses, isPrefetching, prefetchedResponseCount, onGetMoreResponses])
+  }, [localIndex, responses.length, hasNoMoreResponses, prefetchedResponseCount, onGetMoreResponses])
 
   /** Tracks the current response slot (0-based), so the bar moves when navigating back/forward, not only when ratings are saved. */
   const progressPercent = Math.min((localIndex / 6) * 100, 100)
