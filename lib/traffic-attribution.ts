@@ -8,10 +8,14 @@ export function clearStoredTrafficAttribution(): void {
 }
 
 /**
- * When true, `src` and `t` are removed from the URL after they are read so tokens
- * do not stay visible in the address bar. Set to false to keep query params for debugging.
+ * When true, `src` is removed from the URL after it is captured.
  */
-export const STRIP_TRAFFIC_PARAMS_FROM_URL = false
+export const STRIP_SRC_PARAM_FROM_URL = false
+
+/**
+ * When true, `t` is removed from the URL after it is captured.
+ */
+export const STRIP_T_PARAM_FROM_URL = true
 
 /**
  * Reads traffic attribution for session creation.
@@ -54,9 +58,16 @@ export function captureTrafficAttribution(): TrafficAttribution {
     }
   }
 
-  if (STRIP_TRAFFIC_PARAMS_FROM_URL && (hasSrcInUrl || hasTInUrl)) {
-    params.delete('src')
-    params.delete('t')
+  const shouldStripSrc = STRIP_SRC_PARAM_FROM_URL && hasSrcInUrl
+  const shouldStripTrustedToken = STRIP_T_PARAM_FROM_URL && hasTInUrl
+
+  if (shouldStripSrc || shouldStripTrustedToken) {
+    if (shouldStripSrc) {
+      params.delete('src')
+    }
+    if (shouldStripTrustedToken) {
+      params.delete('t')
+    }
     const query = params.toString()
     const path = window.location.pathname
     const hash = window.location.hash
