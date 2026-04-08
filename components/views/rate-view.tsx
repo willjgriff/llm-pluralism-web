@@ -33,6 +33,7 @@ export function RateView({
   const [hasNoMoreResponses, setHasNoMoreResponses] = useState(false)
   const [prefetchedResponseCount, setPrefetchedResponseCount] = useState(0)
   const isPrefetchRequestInFlight = useRef(false)
+  const submittedRatingsByResponse = useRef<Record<string, { score: number; reasoning?: string }>>({})
   /** After the user reaches response 7 (index 6), progress text drops "of 6" and stays that way even if they go back. */
   const [progressExpandedLabel, setProgressExpandedLabel] = useState(false)
 
@@ -72,6 +73,34 @@ export function RateView({
   /** Tracks the current response slot (0-based), so the bar moves when navigating back/forward, not only when ratings are saved. */
   const progressPercent = Math.min((localIndex / 6) * 100, 100)
 
+  const getResponseKey = (response: AIResponse): string => `${response.question_id}:${response.model}`
+
+  const getNormalizedReasoning = (value: string): string | undefined => {
+    const normalized = value.trim()
+    return normalized.length > 0 ? normalized : undefined
+  }
+
+  const submitIfChanged = async (): Promise<void> => {
+    if (!currentResponse || selectedRating === null) return
+    const responseKey = getResponseKey(currentResponse)
+    const reasoning = getNormalizedReasoning(feedback)
+    const previousSubmission = submittedRatingsByResponse.current[responseKey]
+    const hasChanged =
+      !previousSubmission ||
+      previousSubmission.score !== selectedRating ||
+      previousSubmission.reasoning !== reasoning
+
+    if (!hasChanged) return
+
+    await onRatingSubmit({
+      question_id: currentResponse.question_id,
+      model: currentResponse.model,
+      score: selectedRating,
+      reasoning,
+    })
+    submittedRatingsByResponse.current[responseKey] = { score: selectedRating, reasoning }
+  }
+
   const handleSelectRating = (rating: number) => {
     if (!currentResponse) return
     setLocalRatings(prev => ({ ...prev, [localIndex]: rating }))
@@ -91,12 +120,7 @@ export function RateView({
         setIsSubmitting(true)
         setRatingError(null)
         try {
-          await onRatingSubmit({
-            question_id: currentResponse.question_id,
-            model: currentResponse.model,
-            score: selectedRating,
-            reasoning: feedback.trim() || undefined,
-          })
+          await submitIfChanged()
         } catch {
           setRatingError("Couldn't save your rating. Please try again.")
           return
@@ -115,12 +139,7 @@ export function RateView({
     setIsSubmitting(true)
     setRatingError(null)
     try {
-      await onRatingSubmit({
-        question_id: currentResponse.question_id,
-        model: currentResponse.model,
-        score: selectedRating,
-        reasoning: feedback.trim() || undefined,
-      })
+      await submitIfChanged()
       if (localIndex >= responses.length - 1) {
         if (isPrefetching) {
           return
@@ -164,12 +183,7 @@ export function RateView({
     setIsSubmitting(true)
     setRatingError(null)
     try {
-      await onRatingSubmit({
-        question_id: currentResponse.question_id,
-        model: currentResponse.model,
-        score: selectedRating,
-        reasoning: feedback.trim() || undefined,
-      })
+      await submitIfChanged()
       if (document.activeElement instanceof HTMLElement) {
         document.activeElement.blur()
       }
