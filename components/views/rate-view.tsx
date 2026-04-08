@@ -154,8 +154,32 @@ export function RateView({
     }
   }
 
-  const handleSeeResults = () => {
-    onViewResults()
+  const handleSeeResults = async () => {
+    if (isSubmitting) return
+    if (selectedRating === null || !currentResponse) {
+      onViewResults()
+      return
+    }
+
+    setIsSubmitting(true)
+    setRatingError(null)
+    try {
+      await onRatingSubmit({
+        question_id: currentResponse.question_id,
+        model: currentResponse.model,
+        score: selectedRating,
+        reasoning: feedback.trim() || undefined,
+      })
+      if (document.activeElement instanceof HTMLElement) {
+        document.activeElement.blur()
+      }
+      setFeedback("")
+      onViewResults()
+    } catch {
+      setRatingError("Couldn't save your rating. Please try again.")
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   useEffect(() => {
@@ -349,7 +373,8 @@ export function RateView({
                 <Button 
                   size="lg"
                   variant="outline"
-                  onClick={handleSeeResults}
+                  onClick={() => void handleSeeResults()}
+                  disabled={isSubmitting}
                   className="px-8 py-6 text-base font-medium transition-all duration-200"
                   style={{
                     borderColor: "rgb(94, 170, 168)",
