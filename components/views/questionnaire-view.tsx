@@ -3,15 +3,16 @@
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 
+
 const questions = [
-  "The government should play a major role in reducing inequality through taxation and public services.",
-  "Individuals should be free to keep the wealth they earn with minimal state redistribution.",
-  "Nations have a primary duty to protect their own citizens before helping people in other countries.",
-  "Open borders and freedom of movement are broadly good for humanity.",
-  "AI development should be slowed until we better understand the risks.",
-  "The benefits of technological progress strongly outweigh the risks.",
-  "Religious beliefs and institutions should play an active role in public life and policy.",
-  "Public life and policy should be guided by evidence and secular values, not religious belief.",
+  "The state should redistribute wealth through taxation, even if this reduces incentives for individual effort.",
+  "People who succeed should keep those rewards, equalising outcomes is not the government's role.",
+  "A government's first obligation is to its own citizens, even when this means limiting help to people elsewhere.",
+  "National boundaries should not be barriers to human flourishing. People, goods and ideas benefit from moving freely.",
+  "AI is moving too fast and poses risks society isn't ready to manage, caution should come before capability.",
+  "AI's potential to solve humanity's problems is enormous, the risks of moving too slowly outweigh moving too fast.",
+  "Religious values and faith communities should help shape laws and public policy. Society loses something essential without them.",
+  "Laws and policy should be based on evidence and reasoning any citizen can evaluate, faith should remain private.",
 ]
 
 interface QuestionnaireViewProps {
