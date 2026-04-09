@@ -4,7 +4,7 @@ A human validation platform for the [llm-pluralism](https://github.com/willjgrif
 
 For setup instructions see [SETUP.md](SETUP.md)
 
-For live deployment see [makesafeai.org](http://makesafeai.org/?src=github)
+For live deployment see [makesafeai.org](https://makesafeai.org/?src=github)
 
 ---
 
