@@ -1,8 +1,25 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useLayoutEffect } from "react"
 import { Button } from "@/components/ui/button"
 
+/**
+ * Returns a new array containing indices `0 .. length - 1` in random order (Fisher–Yates).
+ *
+ * Parameters:
+ *   length: Number of indices to shuffle (must match questionnaire length).
+ *
+ * Returns:
+ *   A permutation of `[0, 1, …, length - 1]`.
+ */
+function shuffledIndices(length: number): number[] {
+  const indices = Array.from({ length }, (_, index) => index)
+  for (let index = indices.length - 1; index > 0; index--) {
+    const swapWith = Math.floor(Math.random() * (index + 1))
+    ;[indices[index], indices[swapWith]] = [indices[swapWith], indices[index]]
+  }
+  return indices
+}
 
 const questions = [
   "The state should redistribute wealth through taxation, even if this reduces incentives for individual effort.",
@@ -23,7 +40,14 @@ interface QuestionnaireViewProps {
 
 export function QuestionnaireView({ onComplete, error, onClearError }: QuestionnaireViewProps) {
   const [answers, setAnswers] = useState<Record<number, number>>({})
-  
+  const [displayOrder, setDisplayOrder] = useState<number[]>(() =>
+    Array.from({ length: questions.length }, (_, index) => index)
+  )
+
+  useLayoutEffect(() => {
+    setDisplayOrder(shuffledIndices(questions.length))
+  }, [])
+
   const answeredCount = Object.keys(answers).length
   const progress = (answeredCount / questions.length) * 100
   const allAnswered = answeredCount === questions.length
@@ -77,12 +101,12 @@ export function QuestionnaireView({ onComplete, error, onClearError }: Questionn
 
         {/* Questions */}
         <div className="space-y-4">
-          {questions.map((question, index) => (
+          {displayOrder.map((originalIndex) => (
             <QuestionCard
-              key={index}
-              question={question}
-              questionIndex={index}
-              selectedValue={answers[index]}
+              key={originalIndex}
+              question={questions[originalIndex]}
+              questionIndex={originalIndex}
+              selectedValue={answers[originalIndex]}
               onSelect={handleSelect}
             />
           ))}
