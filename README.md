@@ -2,7 +2,9 @@
 
 A human validation platform for the [llm-pluralism](https://github.com/willjgriff/llm-pluralism) evaluation framework. Participants answer a values questionnaire, rate AI responses on contested topics, and discover which frontier model best aligns with their worldview. Their ratings are used to validate whether AI persona-based evaluation scores correlate with real human value judgements.
 
-For setup instructions see [SETUP.md](SETUP.md).
+For setup instructions see [SETUP.md](SETUP.md)
+
+For live deployment see [makesafeai.org](http://makesafeai.org/?src=github)
 
 ---
 

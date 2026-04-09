@@ -13,6 +13,7 @@ ALLOWED_TRAFFIC_SOURCES = frozenset(
     {
         "x",
         "bluedot",
+        "github",
         "reddit",
         "forum",
         "discord",
