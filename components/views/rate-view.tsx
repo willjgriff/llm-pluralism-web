@@ -270,7 +270,7 @@ export function RateView({
               RATE THIS RESPONSE
             </span>
           </div>
-          
+
           {/* Question card */}
           <div 
             className="rounded-lg p-5 mb-4"
@@ -415,12 +415,9 @@ export function RateView({
               </Button>
             )}
             
-            {/* Encouragement text - only show after initial 6 responses */}
-            {localIndex >= 6 && !hasNoMoreResponses && (
-              <p className="text-xs text-muted-foreground italic mt-4">
-                More responses = a more accurate AI match and better research data
-              </p>
-            )}
+            <p className="text-xs text-muted-foreground italic mt-4">
+            Responses were selected based on your value profile. If you have a few extra minutes, rating beyond the first 6 strengthens the research.
+            </p>
             {hasNoMoreResponses && (
               <p className="text-xs text-muted-foreground italic mt-4">
                 You have rated all available responses for this session.
