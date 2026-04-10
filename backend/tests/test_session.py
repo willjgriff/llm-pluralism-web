@@ -112,3 +112,14 @@ def test_trusted_token_stored_when_env_set(client, db_session, monkeypatch):
     row = db_session.query(SessionRow).filter(SessionRow.id == session_id).one()
     assert row.traffic_source == "trusted"
 
+
+def test_rapid_duplicate_session_requests_are_deduped(client, db_session):
+    request_payload = {"answers": VALID_ANSWERS, "is_repeat": False}
+    first_response = client.post("/session", json=request_payload)
+    second_response = client.post("/session", json=request_payload)
+
+    assert first_response.status_code == 200
+    assert second_response.status_code == 200
+    assert first_response.json()["session_id"] == second_response.json()["session_id"]
+    assert db_session.query(SessionRow).count() == 1
+

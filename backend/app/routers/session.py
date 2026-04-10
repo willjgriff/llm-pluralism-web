@@ -1,11 +1,14 @@
 import json
 import random
+import hashlib
+from threading import Lock
+from time import time
 from pathlib import Path
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Request
 from pydantic import BaseModel
 from sqlalchemy.orm import Session as DBSession
 from app.database import get_db
-from app.models.database import Session
+from app.models.database import Session, Rating
 from app.traffic_source import resolve_traffic_source
 
 router = APIRouter()
@@ -26,12 +29,66 @@ MODELS = [
 ]
 TOP_WINDOW_SIZE = 6
 TOP_WEIGHTS = [5, 4, 3, 2, 1, 1]
+SESSION_DEDUPE_TTL_SECONDS = 5
+_SESSION_RESPONSE_BY_FINGERPRINT: dict[str, tuple[float, dict]] = {}
+_SESSION_DEDUPE_LOCK = Lock()
 
 class SessionRequest(BaseModel):
     answers: list[int]
     is_repeat: bool = False
     src: str | None = None
     trusted_token: str | None = None
+
+
+def _session_request_fingerprint(request: SessionRequest, client_request: Request) -> str:
+    """Builds a short-lived dedupe key for rapid duplicate /session submits."""
+    client_host = client_request.client.host if client_request.client else ""
+    user_agent = client_request.headers.get("user-agent", "")
+    payload = {
+        "answers": request.answers,
+        "is_repeat": request.is_repeat,
+        "src": request.src,
+        "trusted_token": request.trusted_token,
+        "client_host": client_host,
+        "user_agent": user_agent,
+    }
+    serialized_payload = json.dumps(payload, sort_keys=True)
+    return hashlib.sha256(serialized_payload.encode("utf-8")).hexdigest()
+
+
+def _get_cached_session_response(fingerprint: str, db: DBSession) -> dict | None:
+    """Returns recent response for a request fingerprint if still valid."""
+    now_seconds = time()
+    with _SESSION_DEDUPE_LOCK:
+        expired_fingerprints = [
+            key
+            for key, (created_seconds, _) in _SESSION_RESPONSE_BY_FINGERPRINT.items()
+            if now_seconds - created_seconds > SESSION_DEDUPE_TTL_SECONDS
+        ]
+        for key in expired_fingerprints:
+            del _SESSION_RESPONSE_BY_FINGERPRINT[key]
+
+        cached_entry = _SESSION_RESPONSE_BY_FINGERPRINT.get(fingerprint)
+        if not cached_entry:
+            return None
+        _, cached_response = cached_entry
+
+    session_id = cached_response.get("session_id")
+    if not session_id:
+        return None
+    session_exists = db.query(Session.id).filter(Session.id == session_id).first()
+    if not session_exists:
+        return None
+    rating_count = db.query(Rating.id).filter(Rating.session_id == session_id).count()
+    if rating_count > 0:
+        return None
+    return cached_response
+
+
+def _store_cached_session_response(fingerprint: str, response: dict) -> None:
+    """Stores session create response for near-term dedupe of rapid repeats."""
+    with _SESSION_DEDUPE_LOCK:
+        _SESSION_RESPONSE_BY_FINGERPRINT[fingerprint] = (time(), response)
 
 def assign_personas(answers: list[int]) -> dict:
     economic_score = answers[1] - answers[0]
@@ -253,7 +310,16 @@ def select_responses(primary_axis: str, seen_question_ids: set[int] | None = Non
     return [_normalize_response(response) for response in selected[:6]]
 
 @router.post("/session")
-def create_session(request: SessionRequest, db: DBSession = Depends(get_db)):
+def create_session(
+    request: SessionRequest,
+    client_request: Request,
+    db: DBSession = Depends(get_db),
+):
+    fingerprint = _session_request_fingerprint(request, client_request)
+    cached_response = _get_cached_session_response(fingerprint, db)
+    if cached_response:
+        return cached_response
+
     personas = assign_personas(request.answers)
     responses = select_responses(personas["primary_axis"])
     traffic_source = resolve_traffic_source(
@@ -271,7 +337,9 @@ def create_session(request: SessionRequest, db: DBSession = Depends(get_db)):
     db.commit()
     db.refresh(session)
 
-    return {
+    response = {
         "session_id": session.id,
         "responses": responses,
     }
+    _store_cached_session_response(fingerprint, response)
+    return response
