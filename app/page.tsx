@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { NetworkCanvas } from "@/components/network-canvas"
 import { LandingView } from "@/components/views/landing-view"
 import { QuestionnaireView } from "@/components/views/questionnaire-view"
@@ -32,6 +32,8 @@ export default function Home() {
   const [appState, setAppState] = useState<AppState>(INITIAL_STATE)
   const [error, setError] = useState<string | null>(null)
   const [trafficAttribution, setTrafficAttribution] = useState<TrafficAttribution>({})
+  const [isCreatingSession, setIsCreatingSession] = useState(false)
+  const isCreatingSessionRef = useRef(false)
 
   useEffect(() => {
     const isRepeat = !!localStorage.getItem("llm_pluralism_completed")
@@ -61,6 +63,9 @@ export default function Home() {
   }
 
   const handleQuestionnaireComplete = async (answers: number[]) => {
+    if (isCreatingSessionRef.current) return
+    isCreatingSessionRef.current = true
+    setIsCreatingSession(true)
     setError(null)
     try {
       const isRepeat = !!localStorage.getItem("llm_pluralism_completed")
@@ -79,6 +84,8 @@ export default function Home() {
       handleNavigate("profile")
     } catch (err) {
       setError("Couldn't connect to the server. Please try again.")
+      isCreatingSessionRef.current = false
+      setIsCreatingSession(false)
     }
   }
 
@@ -139,6 +146,8 @@ export default function Home() {
   const handleReset = () => {
     clearStoredTrafficAttribution()
     setTrafficAttribution({})
+    isCreatingSessionRef.current = false
+    setIsCreatingSession(false)
     setAppState({
       ...INITIAL_STATE,
       isRepeatSession: true,
@@ -162,6 +171,7 @@ export default function Home() {
         {displayedView === "questionnaire" && (
           <QuestionnaireView
             onComplete={handleQuestionnaireComplete}
+            isSubmitting={isCreatingSession}
             error={error}
             onClearError={() => setError(null)}
           />

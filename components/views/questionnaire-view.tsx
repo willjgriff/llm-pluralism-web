@@ -33,12 +33,18 @@ const questions = [
 ]
 
 interface QuestionnaireViewProps {
-  onComplete: (answers: number[]) => void
+  onComplete: (answers: number[]) => Promise<void>
+  isSubmitting?: boolean
   error?: string | null
   onClearError?: () => void
 }
 
-export function QuestionnaireView({ onComplete, error, onClearError }: QuestionnaireViewProps) {
+export function QuestionnaireView({
+  onComplete,
+  isSubmitting = false,
+  error,
+  onClearError,
+}: QuestionnaireViewProps) {
   const [answers, setAnswers] = useState<Record<number, number>>({})
   const [displayOrder, setDisplayOrder] = useState<number[]>(() =>
     Array.from({ length: questions.length }, (_, index) => index)
@@ -57,9 +63,9 @@ export function QuestionnaireView({ onComplete, error, onClearError }: Questionn
   }
 
   const handleContinue = () => {
-    if (!allAnswered) return
+    if (!allAnswered || isSubmitting) return
     const orderedAnswers = questions.map((_, index) => answers[index])
-    onComplete(orderedAnswers)
+    void onComplete(orderedAnswers)
   }
 
   return (
@@ -116,11 +122,11 @@ export function QuestionnaireView({ onComplete, error, onClearError }: Questionn
         <div className="mt-10 text-center">
           <Button 
             size="lg"
-            disabled={!allAnswered}
+            disabled={!allAnswered || isSubmitting}
             onClick={handleContinue}
             className="px-10 py-6 text-base font-medium bg-accent text-accent-foreground hover:bg-accent/90 transition-all duration-200 shadow-lg shadow-accent/25 disabled:opacity-40 disabled:shadow-none disabled:cursor-not-allowed"
           >
-            Continue
+            {isSubmitting ? "Creating session..." : "Continue"}
           </Button>
           {error && (
             <div className="mt-4 flex items-center justify-center gap-3">
