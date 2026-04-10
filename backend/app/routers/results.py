@@ -25,10 +25,16 @@ def _session_row_to_export_dict(session: Session) -> dict:
         "created_at": str(session.created_at),
         "is_repeat": session.is_repeat,
         "primary_persona": session.primary_persona,
+        "primary_axis": session.primary_axis,
         "economic_score": session.economic_score,
         "identity_score": session.identity_score,
         "technology_score": session.technology_score,
         "society_score": session.society_score,
+        "economic_persona": session.economic_persona,
+        "identity_persona": session.identity_persona,
+        "technology_persona": session.technology_persona,
+        "society_persona": session.society_persona,
+        "questionnaire_answers": session.questionnaire_answers,
         "traffic_source": session.traffic_source,
     }
 
