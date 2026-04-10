@@ -32,7 +32,6 @@ export default function Home() {
   const [appState, setAppState] = useState<AppState>(INITIAL_STATE)
   const [error, setError] = useState<string | null>(null)
   const [trafficAttribution, setTrafficAttribution] = useState<TrafficAttribution>({})
-  const [isCreatingSession, setIsCreatingSession] = useState(false)
 
   useEffect(() => {
     const isRepeat = !!localStorage.getItem("llm_pluralism_completed")
@@ -62,19 +61,11 @@ export default function Home() {
   }
 
   const handleQuestionnaireComplete = async (answers: number[]) => {
-    if (isCreatingSession) return
     setError(null)
-    setIsCreatingSession(true)
     try {
       const isRepeat = !!localStorage.getItem("llm_pluralism_completed")
       const personaProfile = assignPersonas(answers)
-      const sessionRequestId = crypto.randomUUID()
-      const sessionResponse = await createSession(
-        answers,
-        isRepeat,
-        trafficAttribution,
-        sessionRequestId
-      )
+      const sessionResponse = await createSession(answers, isRepeat, trafficAttribution)
       const seenQuestionIds = sessionResponse.responses.map((r: AIResponse) => r.question_id)
       setAppState(prev => ({
         ...prev,
@@ -88,8 +79,6 @@ export default function Home() {
       handleNavigate("profile")
     } catch (err) {
       setError("Couldn't connect to the server. Please try again.")
-    } finally {
-      setIsCreatingSession(false)
     }
   }
 
@@ -173,7 +162,6 @@ export default function Home() {
         {displayedView === "questionnaire" && (
           <QuestionnaireView
             onComplete={handleQuestionnaireComplete}
-            isSubmitting={isCreatingSession}
             error={error}
             onClearError={() => setError(null)}
           />
