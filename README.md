@@ -38,14 +38,14 @@ Model identities are never shown during rating, all responses are presented blin
 
 ## Persona assignment
 
-Participants answer 6 questionnaire questions mapped to 4 opposing axis pairs:
+Participants answer 8 questionnaire questions mapped to 4 opposing axis pairs:
 
 | Axis | Question A | Question B | Negative score | Positive score |
 |------|------------|------------|----------------|----------------|
-| Economic | Govt should reduce inequality through taxation | Individuals should keep wealth with minimal redistribution | Collectivist | Libertarian |
-| Identity | Nations have primary duty to own citizens | Open borders broadly good for humanity | Globalist | Nationalist |
-| Technology | AI development should be slowed | Benefits of tech outweigh risks | Tech Sceptic | Tech Optimist |
-| Society | Religion should be active in society | Public life should be guided by secular values | Religious | Secularist |
+| Economic | The state should redistribute wealth through taxation, even if this reduces incentives for individual effort | People who succeed should keep those rewards, equalising outcomes is not the government's role | Collectivist | Libertarian |
+| Identity | A government's first obligation is to its own citizens, even when this means limiting help to people elsewhere | National boundaries should not be barriers to human flourishing. People, goods and ideas benefit from moving freely | Globalist | Nationalist |
+| Technology | AI is moving too fast and poses risks society isn't ready to manage, caution should come before capability | AI's potential to solve humanity's problems is enormous, the risks of moving too slowly outweigh moving too fast | Tech Sceptic | Tech Optimist |
+| Society | Religious values and faith communities should help shape laws and public policy. Society loses something essential without them | Laws and policy should be based on evidence and reasoning any citizen can evaluate, faith should remain private | Religious | Secularist |
 
 Axis scores are computed as:
 
