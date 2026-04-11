@@ -369,6 +369,9 @@ export function RateView({
             </p>
           )}
           <div className="text-center">
+            <p className="mx-auto mb-5 max-w-lg text-xs leading-relaxed tracking-tight text-muted-foreground sm:text-sm">
+            Responses are selected based on your value profile. If you have a few extra minutes, rating up to 18 responses total strengthens the research significantly.
+            </p>
             {canSeeResults ? (
               <div className="flex justify-center gap-4">
                 <Button 
@@ -414,10 +417,6 @@ export function RateView({
                 />
               </Button>
             )}
-            
-            <p className="text-xs text-muted-foreground italic mt-4">
-            Responses were selected based on your value profile. If you have a few extra minutes, rating beyond the first 6 strengthens the research.
-            </p>
             {hasNoMoreResponses && (
               <p className="text-xs text-muted-foreground italic mt-4">
                 You have rated all available responses for this session.
