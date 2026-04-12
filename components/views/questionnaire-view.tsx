@@ -26,11 +26,13 @@ const questions = [
   "People who succeed should keep those rewards, equalising outcomes is not the government's role.",
   "A government's first obligation is to its own citizens, even when this means limiting help to people elsewhere.",
   "National boundaries should not be barriers to human flourishing. People, goods and ideas benefit from moving freely.",
-  "AI is moving too fast and poses risks society isn't ready to manage, caution should come before capability.",
-  "AI's potential to solve humanity's problems is enormous, the risks of moving too slowly outweigh moving too fast.",
+  "Emerging technologies pose risks that society consistently underestimates, precaution should come before progress.",
+  "Technological progress has been humanity's greatest problem-solver, the risks of slowing it down outweigh the risks of moving fast.",
   "Religious values and faith communities should help shape laws and public policy. Society loses something essential without them.",
   "Laws and policy should be based on evidence and reasoning any citizen can evaluate, faith should remain private.",
 ]
+
+
 
 interface QuestionnaireViewProps {
   onComplete: (answers: number[]) => Promise<void>
