@@ -5,6 +5,67 @@ import { CornerDownLeft } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { AIResponse, Rating } from "@/lib/types"
 
+/**
+ * Smoothly scrolls the document and/or an inner overflow container toward the top
+ * over `durationMs` milliseconds using a short ease-out curve (fixed duration, not distance-based).
+ *
+ * Parameters:
+ *   scrollRoot: Optional wrapper element (for example `overflow-y-auto`) whose `scrollTop` is animated.
+ *   durationMs: How long the scroll animation should run in milliseconds.
+ *
+ * Returns:
+ *   Nothing.
+ */
+function scrollViewportTowardTopSmoothly(
+  scrollRoot: HTMLElement | null,
+  durationMs: number,
+): void {
+  const docEl = document.scrollingElement ?? document.documentElement
+  const startDoc = docEl.scrollTop
+  const startRoot = scrollRoot?.scrollTop ?? 0
+  if (startDoc === 0 && startRoot === 0) return
+
+  const startTime = performance.now()
+
+  const tick = (now: number) => {
+    const elapsed = now - startTime
+    const t = Math.min(1, elapsed / durationMs)
+    const eased = 1 - (1 - t) ** 3
+    if (startDoc > 0) {
+      docEl.scrollTop = startDoc * (1 - eased)
+    }
+    if (startRoot > 0 && scrollRoot) {
+      scrollRoot.scrollTop = startRoot * (1 - eased)
+    }
+    if (t < 1) {
+      requestAnimationFrame(tick)
+    }
+  }
+
+  requestAnimationFrame(tick)
+}
+
+/**
+ * Runs `scrollViewportTowardTopSmoothly` after the next frame so React can commit DOM updates first.
+ *
+ * Parameters:
+ *   getScrollRoot: Returns the scrollable rate-view root element, read when the animation starts.
+ *   durationMs: Passed through to `scrollViewportTowardTopSmoothly`.
+ *
+ * Returns:
+ *   Nothing.
+ */
+function scheduleViewportScrollTowardTop(
+  getScrollRoot: () => HTMLElement | null,
+  durationMs: number,
+): void {
+  queueMicrotask(() => {
+    requestAnimationFrame(() => {
+      scrollViewportTowardTopSmoothly(getScrollRoot(), durationMs)
+    })
+  })
+}
+
 interface RateViewProps {
   responses: AIResponse[]
   ratingsCount: number
@@ -33,6 +94,7 @@ export function RateView({
   const [hasNoMoreResponses, setHasNoMoreResponses] = useState(false)
   const [prefetchedResponseCount, setPrefetchedResponseCount] = useState(0)
   const isPrefetchRequestInFlight = useRef(false)
+  const scrollRootRef = useRef<HTMLDivElement>(null)
   const submittedRatingsByResponse = useRef<Record<string, { score: number; reasoning?: string }>>({})
   /** After the user reaches response 7 (index 6), progress text drops "of 6" and stays that way even if they go back. */
   const [progressExpandedLabel, setProgressExpandedLabel] = useState(false)
@@ -133,6 +195,7 @@ export function RateView({
       }
       setLocalIndex(prev => prev + 1)
       setFeedback("")
+      scheduleViewportScrollTowardTop(() => scrollRootRef.current, 320)
       return
     }
     if (selectedRating === null) return
@@ -166,6 +229,7 @@ export function RateView({
       }
       setLocalIndex(prev => prev + 1)
       setFeedback("")
+      scheduleViewportScrollTowardTop(() => scrollRootRef.current, 320)
     } catch {
       setRatingError("Couldn't save your rating. Please try again.")
     } finally {
@@ -221,7 +285,7 @@ export function RateView({
   }
 
   return (
-    <div className="min-h-screen overflow-y-auto">
+    <div ref={scrollRootRef} className="min-h-screen overflow-y-auto">
       {/* Progress indicator at top */}
       <div className="fixed top-0 left-0 right-0 z-20" style={{ backgroundColor: "#080810" }}>
         <div className="flex items-center justify-center h-10">
