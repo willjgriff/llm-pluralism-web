@@ -22,6 +22,9 @@ AXIS_QUESTIONS = {
     "society": [7, 8, 9],
 }
 
+# Lower value wins score ties when picking the runner-up axis for response selection (society-primary case).
+_AXIS_RESPONSE_SELECTION_TIE_ORDER = {"economic": 0, "identity": 1, "technology": 2, "society": 3}
+
 MODELS = [
     "openrouter:anthropic/claude-3.5-haiku",
     "openai:gpt-4.1-mini",
@@ -90,18 +93,54 @@ def _store_cached_session_response(fingerprint: str, response: dict) -> None:
     with _SESSION_DEDUPE_LOCK:
         _SESSION_RESPONSE_BY_FINGERPRINT[fingerprint] = (time(), response)
 
+def _axis_scores_from_answers(answers: list[int]) -> list[dict]:
+    """Builds per-axis absolute deviation scores from questionnaire answers (indices match assign_personas)."""
+    economic_score = answers[1] - answers[0]
+    identity_score = answers[2] - answers[3]
+    technology_score = answers[5] - answers[4]
+    society_score = answers[6] - answers[7]
+    return [
+        {"axis": "economic", "score": abs(economic_score)},
+        {"axis": "identity", "score": abs(identity_score)},
+        {"axis": "technology", "score": abs(technology_score)},
+        {"axis": "society", "score": abs(society_score)},
+    ]
+
+
+def response_selection_axis(answers: list[int]) -> str:
+    """
+    Returns the axis key passed to ``select_responses`` for this questionnaire.
+
+    Matches ``primary_axis`` from ``assign_personas`` except when the dominant axis is
+    ``society`` (Religious / Secularist pole): then uses the second-strongest axis by
+    absolute score. Score ties for runner-up use order economic, identity, technology, society.
+
+    Parameters:
+        answers: Eight Likert values in the same order as session creation.
+
+    Returns:
+        The literal ``centrist``, or one of ``economic``, ``identity``, ``technology``, ``society``.
+    """
+    axis_scores = _axis_scores_from_answers(answers)
+    dominant = max(axis_scores, key=lambda x: x["score"])
+    if dominant["score"] < 2:
+        return "centrist"
+    if dominant["axis"] != "society":
+        return dominant["axis"]
+    sorted_axes = sorted(
+        axis_scores,
+        key=lambda x: (-x["score"], _AXIS_RESPONSE_SELECTION_TIE_ORDER[x["axis"]]),
+    )
+    return sorted_axes[1]["axis"]
+
+
 def assign_personas(answers: list[int]) -> dict:
     economic_score = answers[1] - answers[0]
     identity_score = answers[2] - answers[3]
     technology_score = answers[5] - answers[4]
     society_score = answers[6] - answers[7]
 
-    axis_scores = [
-        {"axis": "economic", "score": abs(economic_score)},
-        {"axis": "identity", "score": abs(identity_score)},
-        {"axis": "technology", "score": abs(technology_score)},
-        {"axis": "society", "score": abs(society_score)},
-    ]
+    axis_scores = _axis_scores_from_answers(answers)
 
     dominant = max(axis_scores, key=lambda x: x["score"])
     is_centrist = dominant["score"] < 2
@@ -321,7 +360,7 @@ def create_session(
         return cached_response
 
     personas = assign_personas(request.answers)
-    responses = select_responses(personas["primary_axis"])
+    responses = select_responses(response_selection_axis(request.answers))
     traffic_source = resolve_traffic_source(
         src=request.src,
         trusted_token=request.trusted_token,

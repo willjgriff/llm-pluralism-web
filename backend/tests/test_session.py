@@ -52,6 +52,21 @@ def test_non_centrist_axis_biases_toward_axis_question_set(client):
     axis_hits = sum(r["question_id"] in economic_question_ids for r in data["responses"])
     assert axis_hits >= 3
 
+
+def test_society_primary_keeps_db_axis_but_selects_like_runner_up(client, db_session):
+    """Society-dominant profile: primary_axis stays society; responses use second-strongest (economic here)."""
+    society_primary_answers = [3, 3, 3, 3, 3, 3, 5, 1]
+    response = create_session(client, answers=society_primary_answers)
+    assert response.status_code == 200
+    data = response.json()
+    session_id = data["session_id"]
+    row = db_session.query(SessionRow).filter(SessionRow.id == session_id).one()
+    assert row.primary_axis == "society"
+    economic_question_ids = {1, 2, 3, 4, 5, 6}
+    axis_hits = sum(r["question_id"] in economic_question_ids for r in data["responses"])
+    assert axis_hits >= 3
+
+
 def test_tie_breaking_still_picks_economic_primary_axis(client, db_session):
     response = create_session(client, answers=[5, 1, 1, 5, 3, 3, 3, 3])
     session_id = response.json()["session_id"]
