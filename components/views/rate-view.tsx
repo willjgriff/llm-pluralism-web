@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect, useRef } from "react"
-import { CornerDownLeft } from "lucide-react"
+import { ChevronDown, ChevronUp, CornerDownLeft } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { AIResponse, Rating } from "@/lib/types"
 
@@ -96,6 +96,8 @@ export function RateView({
   const isPrefetchRequestInFlight = useRef(false)
   const scrollRootRef = useRef<HTMLDivElement>(null)
   const submittedRatingsByResponse = useRef<Record<string, { score: number; reasoning?: string }>>({})
+  const [isRatingGuidanceExpanded, setIsRatingGuidanceExpanded] = useState(true)
+  const [hasAutoCollapsedGuidance, setHasAutoCollapsedGuidance] = useState(false)
   /** After the user reaches response 7 (index 6), progress text drops "of 6" and stays that way even if they go back. */
   const [progressExpandedLabel, setProgressExpandedLabel] = useState(false)
 
@@ -195,6 +197,10 @@ export function RateView({
       }
       setLocalIndex(prev => prev + 1)
       setFeedback("")
+      if (localIndex === 0 && !hasAutoCollapsedGuidance) {
+        setIsRatingGuidanceExpanded(false)
+        setHasAutoCollapsedGuidance(true)
+      }
       scheduleViewportScrollTowardTop(() => scrollRootRef.current, 320)
       return
     }
@@ -229,6 +235,10 @@ export function RateView({
       }
       setLocalIndex(prev => prev + 1)
       setFeedback("")
+      if (localIndex === 0 && !hasAutoCollapsedGuidance) {
+        setIsRatingGuidanceExpanded(false)
+        setHasAutoCollapsedGuidance(true)
+      }
       scheduleViewportScrollTowardTop(() => scrollRootRef.current, 320)
     } catch {
       setRatingError("Couldn't save your rating. Please try again.")
@@ -369,9 +379,33 @@ export function RateView({
           
           {/* Rating section */}
           <div className="text-center mb-6">
-            <p className="text-muted-foreground text-sm mb-6">
-              How reasonable is this response from your perspective?
-            </p>
+            <div className="mb-4 flex items-center justify-center gap-2">
+              <p className="text-muted-foreground text-sm">
+                How reasonable is this response from your perspective?
+              </p>
+              <button
+                type="button"
+                onClick={() => setIsRatingGuidanceExpanded(prev => !prev)}
+                className="inline-flex items-center gap-1 text-xs text-muted-foreground underline underline-offset-4 transition-colors hover:text-foreground/90"
+                aria-expanded={isRatingGuidanceExpanded}
+              >
+                <span>Rating Guidance</span>
+                {isRatingGuidanceExpanded ? (
+                  <ChevronUp className="size-3.5 shrink-0 text-muted-foreground" aria-hidden />
+                ) : (
+                  <ChevronDown className="size-3.5 shrink-0 text-muted-foreground" aria-hidden />
+                )}
+              </button>
+            </div>
+            {isRatingGuidanceExpanded && (
+              <div className="mb-6 rounded-lg border border-white/10 bg-white/[0.02] px-4 py-3 text-left">
+                <ul className="list-disc space-y-1.5 pl-5 text-xs leading-relaxed text-muted-foreground sm:text-sm">
+                  <li>These responses were pre-generated and selected using your value profile, none are created for you personally.</li>
+                  <li>Please rate the content of the response on its merits, whether the reasoning and position seem reasonable to you. Not its academic rigour, factual completeness, or whether you think AI should answer this type of question.</li>
+                  <li>Responses are limited to 80 words.</li>
+                </ul>
+              </div>
+            )}
             
             {/* Circles on row 1; labels below, centered under 1 and 5; label margins add space between phrases only */}
             <div className="mx-auto grid w-max grid-cols-[repeat(5,2.75rem)] gap-x-3 gap-y-2 sm:grid-cols-[repeat(5,3rem)] sm:gap-x-4 sm:gap-y-2.5">
@@ -434,7 +468,7 @@ export function RateView({
           )}
           <div className="text-center">
             <p className="mx-auto mb-5 max-w-lg text-xs leading-relaxed tracking-tight text-muted-foreground sm:text-sm">
-            Responses are selected based on your value profile. If you have a few extra minutes, rating up to 18 responses total strengthens the research significantly.
+            If you have a few extra minutes, rating up to 18 responses total strengthens the research significantly.
             </p>
             {canSeeResults ? (
               <div className="flex justify-center gap-4">
