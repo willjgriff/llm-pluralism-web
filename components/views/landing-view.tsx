@@ -29,12 +29,12 @@ export function LandingView({ onStart }: LandingViewProps) {
 
         {/* Headline */}
         <h1 className="text-4xl sm:text-5xl font-bold tracking-tight text-white mb-6 text-balance">
-          Which AI understands your worldview?
+          Does AI understand your worldview?
         </h1>
 
         {/* Subheadline */}
         <p className="text-lg sm:text-xl text-[#a0a0a8] font-normal leading-relaxed mb-12 text-pretty">
-          Answer a few questions about your values, rate a few AI responses, and discover which model aligns with how you see the world. Your ratings help us understand whether AI truly works for everyone.
+          Answer a few questions about your values, rate a few AI responses, and discover how aligned you are with AI. Your ratings help us understand whether AI truly works for everyone.
         </p>
 
         {/* Feature bullets */}

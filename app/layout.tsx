@@ -7,7 +7,7 @@ const _geist = Geist({ subsets: ["latin"] });
 const _geistMono = Geist_Mono({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: 'Which AI gets you?',
+  title: 'Does AI get you?',
   description: 'Rate AI responses on contested topics and see how well AI performs for someone with your values.',
   generator: 'v0.app',
   icons: {

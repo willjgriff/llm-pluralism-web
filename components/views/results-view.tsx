@@ -24,12 +24,6 @@ interface ResultsViewProps {
   onReset: () => void
 }
 
-const MODEL_LABS: Record<string, string> = {
-  "openrouter:anthropic/claude-3.5-haiku": "by Anthropic",
-  "openai:gpt-4.1-mini": "by OpenAI",
-  "openrouter:x-ai/grok-4-fast": "by xAI",
-}
-
 /** Prefix for bar row `id` so `LabelList` content still sees it after Recharts `filterProps` strips `payload` / `type`. */
 const AGGREGATE_UNAVAILABLE_ID_PREFIX = "llm-pluralism-aggregate-unavailable"
 
@@ -69,9 +63,22 @@ const getBarColor = (type: string) => ({
   other: WHITE_20,
 }[type] ?? WHITE_20)
 
+/**
+ * Formats a mean score for share-card copy (up to two decimal places, no trailing zeros).
+ *
+ * Parameters:
+ *   value: Raw mean score from aggregates or user averages.
+ *
+ * Returns:
+ *   A compact string such as "3.2" or "2.24".
+ */
+function formatShareScore(value: number): string {
+  return parseFloat(value.toFixed(2)).toString()
+}
+
 export function ResultsView({ results, personaProfile, onReset }: ResultsViewProps) {
   const [copied, setCopied] = useState(false)
-  const [chartExpanded, setChartExpanded] = useState(false)
+  const [chartExpanded, setChartExpanded] = useState(true)
 
   const userMeanScore = results.model_scores.length > 0
     ? Math.round((results.model_scores.reduce((sum, m) => sum + m.mean_score, 0) / results.model_scores.length) * 10) / 10
@@ -86,6 +93,37 @@ export function ResultsView({ results, personaProfile, onReset }: ResultsViewPro
     : 0
 
   const isCentrist = personaProfile.primaryPersona === "Centrist"
+
+  const sharePersonaLabel = [
+    personaProfile.economic,
+    personaProfile.identity,
+    personaProfile.technology,
+    personaProfile.society,
+  ]
+    .filter((p) => p !== "Neutral")
+    .join(" · ")
+
+  const shareAsLine = isCentrist
+    ? "As a Centrist"
+    : sharePersonaLabel.length > 0
+      ? `As a ${sharePersonaLabel}`
+      : `As a ${personaProfile.primaryPersona}`
+
+  const shareHeadlineLine = isCentrist
+    ? `${shareAsLine}, I rated AI responses ${userMeanScore}/5 for reasonableness`
+    : `${shareAsLine}, I rated AI ${userMeanScore}/5 for reasonableness`
+
+  const sharePersonaAvgDisplay = formatShareScore(personaAvgScore)
+  const shareOverallAvgDisplay = formatShareScore(overallAvgScore)
+
+  const shareComparisonLine = isCentrist
+    ? `The average across all groups is ${shareOverallAvgDisplay}/5. Does AI understand your worldview?`
+    : `The average ${personaProfile.primaryPersona} rates it ${sharePersonaAvgDisplay}/5. Does AI understand your worldview?`
+
+  const shareClipboardText = `LLM PLURALISM EVALUATION
+${shareHeadlineLine}
+${shareComparisonLine}
+https://makesafeai.org/`
 
   const collapsedChartData = [
     { persona: "You", score: userMeanScore, type: "user" },
@@ -149,16 +187,7 @@ export function ResultsView({ results, personaProfile, onReset }: ResultsViewPro
   const chartHeight = chartExpanded ? 440 : 140
 
   const handleCopyToClipboard = () => {
-    const personas = [personaProfile.economic, personaProfile.identity, personaProfile.technology, personaProfile.society]
-      .filter(p => p !== "Neutral")
-      .join(" · ")
-    const shareText = `LLM PLURALISM EVALUATION
-${personas}
-My AI match: ${results.best_match.model_display_name}
-Rated AI responses ${userMeanScore}/5 for reasonableness
-Find out which AI model understands your worldview:
-https://makesafeai.org/`
-    navigator.clipboard.writeText(shareText)
+    navigator.clipboard.writeText(shareClipboardText)
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
   }
@@ -171,10 +200,9 @@ https://makesafeai.org/`
     <div className="min-h-screen overflow-y-auto">
       <div className="relative z-10 w-full max-w-[640px] mx-auto px-4 sm:px-6 py-16">
         
-        {/* Section 1 — Your AI Match */}
+        {/* Section 1 — Badge + how your score compares (same vertical rhythm as former model-match header) */}
         <section className="mb-16">
-          {/* Badge */}
-          <div className="flex justify-center mb-6">
+          <div className="flex justify-center mb-8">
             <span 
               className="px-3 py-1 text-xs font-medium tracking-wider rounded-full"
               style={{ 
@@ -186,155 +214,25 @@ https://makesafeai.org/`
             </span>
           </div>
 
-          <h2 
-            className="text-3xl font-bold text-center mb-8"
+          <h2
+            className="text-balance text-center text-2xl font-bold tracking-tight sm:text-3xl mb-8"
             style={{ color: "rgba(255, 255, 255, 0.95)" }}
           >
-            Your AI model match
+            How reasonable do you find AI?
           </h2>
-
-          {/* Featured best match card */}
-          <div 
-            className="rounded-xl p-6 mb-4"
-            style={{ 
-              backgroundColor: WHITE_03,
-              border: "1px solid rgba(45, 212, 191, 0.3)"
-            }}
-          >
-            <p 
-              className="text-xs uppercase tracking-wider mb-2"
-              style={{ color: WHITE_40 }}
-            >
-              BEST MATCH
-            </p>
-            <p 
-              className="text-3xl font-bold"
-              style={{ color: "rgba(255, 255, 255, 0.95)" }}
-            >
-              {results.best_match.model_display_name}
-            </p>
-            <p 
-              className="text-sm mt-1"
-              style={{ color: WHITE_50 }}
-            >
-              {MODEL_LABS[results.best_match.model] ?? ""}
-            </p>
-            <p 
-              className="text-sm mt-3"
-              style={{ color: WHITE_60 }}
-            >
-              {results.best_match.model_display_name} produced the responses you rated most reasonable across your session.
-            </p>
-          </div>
-
-          {/* Label above model cards */}
-          <p 
-            className="text-xs uppercase tracking-wider text-center mb-4"
-            style={{ color: WHITE_40 }}
-          >
-            Models you rated
-          </p>
-
-          {/* Three model score cards */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6">
-            {results.model_scores.map((model) => (
-              <div 
-                key={model.model}
-                className="rounded-xl p-4"
-                style={{ 
-                  backgroundColor: WHITE_03,
-                  border: model.model === results.best_match.model
-                    ? "1px solid rgba(45, 212, 191, 0.3)" 
-                    : `1px solid ${WHITE_10}`
-                }}
-              >
-                <p 
-                  className="text-sm font-medium mb-2"
-                  style={{ color: WHITE_90 }}
-                >
-                  {model.model_display_name}
-                </p>
-                <div className="flex items-baseline gap-1 mb-2">
-                  <span 
-                    className="text-2xl font-bold"
-                    style={{ color: TEAL }}
-                  >
-                    {model.mean_score}
-                  </span>
-                  <span 
-                    className="text-xs"
-                    style={{ color: WHITE_40 }}
-                  >
-                    / 5 avg
-                  </span>
-                </div>
-                {/* Score bar */}
-                <div 
-                  className="h-1 w-full rounded-full"
-                  style={{ backgroundColor: WHITE_10 }}
-                >
-                  <div 
-                    className="h-full rounded-full"
-                    style={{ 
-                      width: `${(model.mean_score / 5) * 100}%`,
-                      backgroundColor: TEAL
-                    }}
-                  />
-                </div>
-              </div>
-            ))}
-          </div>
-
-          <p 
-            className="text-center text-sm mx-auto"
-            style={{ color: WHITE_40, maxWidth: "560px" }}
-          >
-            These are not the latest versions from each organisation, but research suggests value alignment patterns are consistent across model generations. Your match is likely to reflect your experience with newer versions too.
-          </p>
-        </section>
-
-        {/* Section 2 — Value Profile */}
-        <section className="mb-16">
-          <h2 
-            className="text-2xl font-bold text-center mb-3"
-            style={{ color: "rgba(255, 255, 255, 0.95)" }}
-          >
-            Your primary value dimension is <span style={{ color: TEAL }}>{personaProfile.primaryPersona}</span>
-          </h2>
-
-          <p 
-            className="text-center mb-10"
-            style={{ color: WHITE_55 }}
-          >
-            Here&apos;s how your values map across all four dimensions
-          </p>
-
-          <ValueSliders personaProfile={personaProfile} />
-        </section>
-
-        {/* Section 3 — How Your Worldview Compares */}
-        <section className="mb-16">
-          <h3 
-            className="text-2xl font-semibold text-center mb-2"
-            style={{ color: "rgba(255, 255, 255, 0.95)" }}
-          >
-            How your score compares
-          </h3>
-          <p
-            className="text-center text-sm mb-3"
-            style={{ color: WHITE_55 }}
-          >
-            Average reasonableness rating given to AI responses, grouped by value perspective
-          </p>
-          {!results.use_live_data && (
+          <div className="mx-auto mb-3 max-w-lg sm:mb-4">
             <p
-              className="text-sm text-center mb-8"
-              style={{ color: WHITE_40 }}
+              id="results-chart-subtitle"
+              className="text-center"
+              style={{ color: WHITE_55 }}
+              aria-describedby={
+                !results.use_live_data ? "results-evaluator-data-footnote" : undefined
+              }
             >
-              Currently based on AI evaluator data, updates with real participant data as more people complete the survey
+              Average rating given to AI responses, grouped by value profile
+              {!results.use_live_data ? "*" : ""}
             </p>
-          )}
-          {results.use_live_data && <div className="mb-8" />}
+          </div>
 
           {/* Horizontal bar chart with animated height */}
           <div 
@@ -403,6 +301,16 @@ https://makesafeai.org/`
             </ResponsiveContainer>
           </div>
 
+          {!results.use_live_data && (
+            <p
+              id="results-evaluator-data-footnote"
+              className="mx-auto mb-4 max-w-lg text-center text-sm leading-snug"
+              style={{ color: WHITE_40 }}
+            >
+              *Currently based on AI evaluator data, updates with real participant data as more people complete the survey
+            </p>
+          )}
+
           {/* Legend - only in expanded state */}
           {chartExpanded && (
             <div className="flex justify-center gap-6 mb-4">
@@ -421,9 +329,10 @@ https://makesafeai.org/`
             </div>
           )}
 
-          {/* Expand/collapse button */}
-          <div className="flex justify-center mb-6">
+          {/* Expand/collapse button — hidden for now; restore: `mb-6 flex justify-center` (no `hidden`) */}
+          <div className="mb-6 hidden">
             <button
+              type="button"
               onClick={() => setChartExpanded(!chartExpanded)}
               className="px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200"
               style={{ 
@@ -442,7 +351,7 @@ https://makesafeai.org/`
             style={{ color: WHITE_60 }}
           >
             {chartExpanded 
-              ? "People with more progressive value profiles consistently find AI more reasonable, a pattern that holds across our full evaluation dataset."
+              ? "People with more progressive values find AI more reasonable according to our data."
               : isCentrist
                 ? `You rated AI ${userMeanScore}/5 on average. Your values are broadly centrist, we don't yet have enough participant data to compare you to a specific group.`
                 : `You rated AI ${userMeanScore}/5 on average. The average ${personaProfile.primaryPersona} rates AI ${personaAvgScore}/5, you are ${userMeanScore > personaAvgScore ? 'more' : 'less'} positive about AI than most people with your values.`
@@ -450,7 +359,26 @@ https://makesafeai.org/`
           </p>
         </section>
 
-        {/* Section 4 — Share & Learn More */}
+        {/* Section 2 — Value Profile */}
+        <section className="mb-16">
+          <h2 
+            className="text-2xl font-bold text-center mb-3"
+            style={{ color: "rgba(255, 255, 255, 0.95)" }}
+          >
+            Your primary value dimension is <span style={{ color: TEAL }}>{personaProfile.primaryPersona}</span>
+          </h2>
+
+          <p 
+            className="text-center mb-10"
+            style={{ color: WHITE_55 }}
+          >
+            Here&apos;s how your values map across all four dimensions
+          </p>
+
+          <ValueSliders personaProfile={personaProfile} />
+        </section>
+
+        {/* Section 3 — Share & Learn More */}
         <section>
           <h3 
             className="text-2xl font-semibold text-center mb-8"
@@ -474,33 +402,19 @@ https://makesafeai.org/`
               LLM PLURALISM EVALUATION
             </p>
             <p 
-              className="text-sm font-medium mt-1"
+              className="mt-3 text-sm font-medium leading-relaxed"
               style={{ color: WHITE_90 }}
             >
-              {[personaProfile.economic, personaProfile.identity, personaProfile.technology, personaProfile.society]
-                .filter(p => p !== 'Neutral')
-                .join(' · ')}
+              {shareHeadlineLine}
             </p>
             <p 
-              className="text-base font-semibold mt-2"
-              style={{ color: "rgba(255, 255, 255, 0.95)" }}
-            >
-              My AI match: {results.best_match.model_display_name}
-            </p>
-            <p 
-              className="text-sm"
+              className="mt-2 text-sm leading-relaxed"
               style={{ color: WHITE_60 }}
             >
-              Rated AI responses {userMeanScore}/5 for reasonableness
+              {shareComparisonLine}
             </p>
             <p 
-              className="text-sm mt-2"
-              style={{ color: WHITE_90 }}
-            >
-              Find out which AI model understands your worldview:
-            </p>
-            <p 
-              className="text-xs mt-1"
+              className="mt-3 text-xs"
               style={{ color: WHITE_40 }}
             >
               https://makesafeai.org/
