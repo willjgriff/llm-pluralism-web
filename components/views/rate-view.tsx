@@ -401,7 +401,7 @@ export function RateView({
               <div className="mb-6 rounded-lg border border-white/10 bg-white/[0.02] px-4 py-3 text-left">
                 <ul className="list-disc space-y-1.5 pl-5 text-xs leading-relaxed text-muted-foreground sm:text-sm">
                   <li>These responses were pre-generated and selected using your value profile, none are created for you personally.</li>
-                  <li>Please rate the content of the response on its merits, whether the reasoning and position seem reasonable to you. Not its academic rigour, factual completeness, or whether you think AI should answer this type of question.</li>
+                  <li>Please rate the content of the response on its merits, whether the reasoning and position seem reasonable to you. Not its academic rigour, factual correctness, or whether you think AI should answer this type of question.</li>
                   <li>Responses are limited to 80 words.</li>
                 </ul>
               </div>
