@@ -306,7 +306,7 @@ https://makesafeai.org/`
               className="mx-auto mb-4 max-w-lg text-center text-sm leading-snug"
               style={{ color: WHITE_40 }}
             >
-              *Currently based on AI evaluator data, updates with real participant data once more people complete the survey
+              *Currently based on AI evaluator data, updates with real participant data once enough people complete the survey
             </p>
           )}
 
@@ -346,11 +346,11 @@ https://makesafeai.org/`
 
           {/* Dynamic callout text */}
           <p
-            className="mx-auto mb-2 max-w-lg text-balance text-center text-[15px] font-normal leading-relaxed"
+            className="mx-auto mb-2 max-w-lg text-center text-[15px] font-normal leading-relaxed"
             style={{ color: WHITE_55 }}
           >
             {chartExpanded 
-              ? "We've found people with more progressive values find AI more reasonable."
+              ? "Our research suggests people with more progressive values find AI more reasonable."
               : isCentrist
                 ? `You rated AI ${userMeanScore}/5 on average. Your values are broadly centrist, we don't yet have enough participant data to compare you to a specific group.`
                 : `You rated AI ${userMeanScore}/5 on average. The average ${personaProfile.primaryPersona} rates AI ${personaAvgScore}/5, you are ${userMeanScore > personaAvgScore ? 'more' : 'less'} positive about AI than most people with your values.`
