@@ -21,7 +21,6 @@ const WHITE_03 = "rgba(255, 255, 255, 0.03)"
 interface ResultsViewProps {
   results: Results
   personaProfile: PersonaProfile
-  onReset: () => void
 }
 
 /** Prefix for bar row `id` so `LabelList` content still sees it after Recharts `filterProps` strips `payload` / `type`. */
@@ -76,9 +75,8 @@ function formatShareScore(value: number): string {
   return parseFloat(value.toFixed(2)).toString()
 }
 
-export function ResultsView({ results, personaProfile, onReset }: ResultsViewProps) {
+export function ResultsView({ results, personaProfile }: ResultsViewProps) {
   const [copied, setCopied] = useState(false)
-  const [chartExpanded, setChartExpanded] = useState(true)
 
   const userMeanScore = results.model_scores.length > 0
     ? Math.round((results.model_scores.reduce((sum, m) => sum + m.mean_score, 0) / results.model_scores.length) * 10) / 10
@@ -125,14 +123,6 @@ ${shareHeadlineLine}
 ${shareComparisonLine}
 https://makesafeai.org/`
 
-  const collapsedChartData = [
-    { persona: "You", score: userMeanScore, type: "user" },
-    isCentrist && personaAvgScore === 0
-      ? { id: `${AGGREGATE_UNAVAILABLE_ID_PREFIX}-collapsed`, persona: "Centrist avg", score: 0, type: "unavailable" }
-      : { persona: `${personaProfile.primaryPersona} avg`, score: personaAvgScore, type: "personaAvg" },
-    { persona: "Overall avg", score: overallAvgScore, type: "overall" },
-  ]
-
   const PERSONA_ORDER: Record<string, number> = {
     "You": 0,
     "Libertarian": 1,
@@ -170,7 +160,7 @@ https://makesafeai.org/`
     (a, b) => (PERSONA_ORDER[a.persona] ?? 10) - (PERSONA_ORDER[b.persona] ?? 10)
   )
 
-  const expandedChartData = sortedRows.reduce((acc: any[], entry, index) => {
+  const chartData = sortedRows.reduce((acc: any[], entry, index) => {
     acc.push(entry)
     if (PAIR_END_PERSONAS.has(entry.persona) && index < sortedRows.length - 1) {
       acc.push({
@@ -183,8 +173,7 @@ https://makesafeai.org/`
     return acc
   }, [])
 
-  const chartData = chartExpanded ? expandedChartData : collapsedChartData
-  const chartHeight = chartExpanded ? 440 : 140
+  const chartHeight = 440
 
   const handleCopyToClipboard = () => {
     navigator.clipboard.writeText(shareClipboardText)
@@ -192,15 +181,11 @@ https://makesafeai.org/`
     setTimeout(() => setCopied(false), 2000)
   }
 
-  const handleStartOver = () => {
-    onReset()
-  }
-
   return (
     <div className="min-h-screen overflow-y-auto">
       <div className="relative z-10 w-full max-w-[640px] mx-auto px-4 sm:px-6 py-16">
         
-        {/* Section 1 — Badge + how your score compares (same vertical rhythm as former model-match header) */}
+        {/* Section 1 — Badge + intro */}
         <section className="mb-16">
           <div className="flex justify-center mb-8">
             <span 
@@ -214,7 +199,7 @@ https://makesafeai.org/`
             </span>
           </div>
 
-          <div className="mb-8 text-center">
+          <div className="text-center">
             <h2
               className="text-balance text-2xl font-bold tracking-tight sm:text-3xl mb-3 sm:mb-4"
               style={{ color: "rgba(255, 255, 255, 0.95)" }}
@@ -222,16 +207,55 @@ https://makesafeai.org/`
               Thank you for contributing
             </h2>
             <p
-              className="mx-auto max-w-lg text-balance text-base font-normal leading-relaxed"
+              className="mx-auto max-w-lg text-base font-normal leading-relaxed"
               style={{ color: WHITE_55 }}
-              aria-describedby={
-                !results.use_live_data ? "results-evaluator-data-footnote" : undefined
-              }
             >
-              Frontier AI models are trained on human feedback, but that feedback doesn't represent everyone equally. Here's how reasonableness ratings vary across different value profiles, and where you sit.
-              {!results.use_live_data ? "*" : ""}
+              Frontier AI models are trained on human feedback, but not all perspectives are equally represented.
+              Your ratings help us build a clearer picture of who AI is actually working for.
             </p>
           </div>
+        </section>
+
+        {/* Section 2 — Value profile */}
+        <section className="mb-16">
+          <h2 
+            className="text-2xl font-bold text-center mb-3"
+            style={{ color: "rgba(255, 255, 255, 0.95)" }}
+          >
+            Your primary value dimension is <span style={{ color: TEAL }}>{personaProfile.primaryPersona}</span>
+          </h2>
+
+          <p 
+            className="text-center mb-10"
+            style={{ color: WHITE_55 }}
+          >
+            Here&apos;s how your values map across all four dimensions
+          </p>
+
+          <ValueSliders personaProfile={personaProfile} />
+        </section>
+
+        {/* Section 3 — Ratings chart */}
+        <section className="mb-16">
+          <h2 
+            className="text-2xl font-bold text-center mb-3"
+            style={{ color: "rgba(255, 255, 255, 0.95)" }}
+          >
+            How your rating compares
+          </h2>
+
+          <p
+            id="results-chart-subtitle"
+            className="mx-auto mb-6 max-w-lg text-center text-base font-normal leading-relaxed sm:mb-8"
+            style={{ color: WHITE_55 }}
+            aria-describedby={
+              !results.use_live_data ? "results-evaluator-data-footnote" : undefined
+            }
+          >
+            {isCentrist
+              ? `You rated AI ${userMeanScore}/5 on average. Your values are broadly centrist, we don't yet have enough participant data to compare you to a specific group${!results.use_live_data ? "*" : "."}`
+              : `You rated AI ${userMeanScore}/5 on average. The average ${personaProfile.primaryPersona} rates AI ${personaAvgScore}/5, you are ${userMeanScore > personaAvgScore ? 'more' : 'less'} positive about AI than most people with your values${!results.use_live_data ? "*" : "."}`}
+          </p>
 
           {/* Horizontal bar chart with animated height */}
           <div 
@@ -300,6 +324,22 @@ https://makesafeai.org/`
             </ResponsiveContainer>
           </div>
 
+          {/* Legend */}
+          <div className="mb-4 flex justify-center gap-6">
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: TEAL }} />
+              <span className="text-xs" style={{ color: WHITE_50 }}>You</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: TEAL_DARK }} />
+              <span className="text-xs" style={{ color: WHITE_50 }}>Your value profile</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: WHITE_20 }} />
+              <span className="text-xs" style={{ color: WHITE_50 }}>Other groups</span>
+            </div>
+          </div>
+
           {!results.use_live_data && (
             <p
               id="results-evaluator-data-footnote"
@@ -309,75 +349,42 @@ https://makesafeai.org/`
               *Currently based on AI evaluator data, updates with real participant data once enough people complete the survey
             </p>
           )}
-
-          {/* Legend - only in expanded state */}
-          {chartExpanded && (
-            <div className="flex justify-center gap-6 mb-4">
-              <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: TEAL }} />
-                <span className="text-xs" style={{ color: WHITE_50 }}>You</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: TEAL_DARK }} />
-                <span className="text-xs" style={{ color: WHITE_50 }}>Your persona</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: WHITE_20 }} />
-                <span className="text-xs" style={{ color: WHITE_50 }}>Other groups</span>
-              </div>
-            </div>
-          )}
-
-          {/* Expand/collapse button — hidden for now; restore: `mb-6 flex justify-center` (no `hidden`) */}
-          <div className="mb-6 hidden">
-            <button
-              type="button"
-              onClick={() => setChartExpanded(!chartExpanded)}
-              className="px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200"
-              style={{ 
-                backgroundColor: "transparent",
-                color: TEAL,
-                border: `1px solid ${TEAL}`
-              }}
-            >
-              {chartExpanded ? "Show less ▲" : "See how all groups compare ▼"}
-            </button>
-          </div>
-
-          {/* Dynamic callout text */}
-          <p
-            className="mx-auto mb-2 max-w-lg text-center text-[15px] font-normal leading-relaxed"
-            style={{ color: WHITE_55 }}
-          >
-            {chartExpanded 
-              ? "Our research suggests people with more progressive values find AI more reasonable."
-              : isCentrist
-                ? `You rated AI ${userMeanScore}/5 on average. Your values are broadly centrist, we don't yet have enough participant data to compare you to a specific group.`
-                : `You rated AI ${userMeanScore}/5 on average. The average ${personaProfile.primaryPersona} rates AI ${personaAvgScore}/5, you are ${userMeanScore > personaAvgScore ? 'more' : 'less'} positive about AI than most people with your values.`
-            }
-          </p>
         </section>
 
-        {/* Section 2 — Value Profile */}
+        {/* About the research — before share */}
         <section className="mb-16">
-          <h2 
-            className="text-2xl font-bold text-center mb-3"
+          <h2
+            className="text-2xl font-bold text-center mb-4"
             style={{ color: "rgba(255, 255, 255, 0.95)" }}
           >
-            Your primary value dimension is <span style={{ color: TEAL }}>{personaProfile.primaryPersona}</span>
+            About the research
           </h2>
-
-          <p 
-            className="text-center mb-10"
+          <div
+            className="mx-auto mb-8 max-w-lg space-y-4 text-center text-base font-normal leading-relaxed"
             style={{ color: WHITE_55 }}
           >
-            Here&apos;s how your values map across all four dimensions
-          </p>
-
-          <ValueSliders personaProfile={personaProfile} />
+            <p>
+              This survey is part of a project exploring pluralistic alignment in frontier AI models. Using a bridging score methodology inspired by Community Notes, we measure whether AI responses are acceptable across ideologically diverse groups, not just on average.
+            </p>
+            <p>
+              Our findings so far suggest that people with more progressive values find AI responses more reasonable than those with conservative or libertarian values, a pattern consistent across all frontier models tested. 
+              We're collecting human ratings to validate whether this holds beyond AI evaluators.
+            </p>
+          </div>
+          <div className="flex flex-col items-center gap-6">
+            <a
+              href="https://github.com/willjgriff/llm-pluralism"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-center text-base font-medium transition-opacity hover:opacity-80"
+              style={{ color: TEAL }}
+            >
+              View Research →
+            </a>
+          </div>
         </section>
 
-        {/* Section 3 — Share & Learn More */}
+        {/* Section 4 — Share & Learn More */}
         <section>
           <h3 
             className="text-2xl font-semibold text-center mb-8"
@@ -432,42 +439,6 @@ https://makesafeai.org/`
               }}
             >
               {copied ? "Copied ✓" : "Copy to clipboard"}
-            </button>
-          </div>
-
-          {/* Divider */}
-          <div 
-            className="w-full h-px mb-8"
-            style={{ backgroundColor: WHITE_10 }}
-          />
-
-          {/* Research credit */}
-          <p 
-            className="text-sm text-center mb-3"
-            style={{ color: WHITE_60 }}
-          >
-            Curious about the methodology? This is part of an ongoing AI safety research project exploring pluralistic alignment in frontier LLMs.
-          </p>
-          
-          <div className="flex justify-center mb-6">
-            <a 
-              href="https://github.com/willjgriff/llm-pluralism" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="text-sm font-medium transition-opacity hover:opacity-80"
-              style={{ color: TEAL }}
-            >
-              View Research on GitHub →
-            </a>
-          </div>
-
-          <div className="flex justify-center">
-            <button
-              onClick={handleStartOver}
-              className="text-sm transition-opacity hover:opacity-80"
-              style={{ color: WHITE_40 }}
-            >
-              Take the survey again
             </button>
           </div>
         </section>

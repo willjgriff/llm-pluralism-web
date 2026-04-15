@@ -9,7 +9,7 @@ import { RateView } from "@/components/views/rate-view"
 import { ResultsView } from "@/components/views/results-view"
 import { assignPersonas } from "@/lib/personas"
 import { createSession, submitRating, getResults, getMoreResponses } from "@/lib/api"
-import { captureTrafficAttribution, clearStoredTrafficAttribution } from "@/lib/traffic-attribution"
+import { captureTrafficAttribution } from "@/lib/traffic-attribution"
 import { AppState, Rating, AIResponse, PersonaProfile, Results, TrafficAttribution } from "@/lib/types"
 
 type View = "landing" | "questionnaire" | "profile" | "rate" | "results"
@@ -143,18 +143,6 @@ export default function Home() {
     }
   }
 
-  const handleReset = () => {
-    clearStoredTrafficAttribution()
-    setTrafficAttribution({})
-    isCreatingSessionRef.current = false
-    setIsCreatingSession(false)
-    setAppState({
-      ...INITIAL_STATE,
-      isRepeatSession: true,
-    })
-    handleNavigate("landing")
-  }
-
   return (
     <main className="relative min-h-screen bg-[#080810]">
       <NetworkCanvas />
@@ -197,7 +185,6 @@ export default function Home() {
           <ResultsView
             results={appState.results}
             personaProfile={appState.personaProfile}
-            onReset={handleReset}
           />
         )}
       </div>
