@@ -214,22 +214,21 @@ https://makesafeai.org/`
             </span>
           </div>
 
-          <h2
-            className="text-balance text-center text-2xl font-bold tracking-tight sm:text-3xl mb-8"
-            style={{ color: "rgba(255, 255, 255, 0.95)" }}
-          >
-            How reasonable do you find AI?
-          </h2>
-          <div className="mx-auto mb-3 max-w-lg sm:mb-4">
+          <div className="mb-8 text-center">
+            <h2
+              className="text-balance text-2xl font-bold tracking-tight sm:text-3xl mb-3 sm:mb-4"
+              style={{ color: "rgba(255, 255, 255, 0.95)" }}
+            >
+              Thank you for contributing
+            </h2>
             <p
-              id="results-chart-subtitle"
-              className="text-center"
+              className="mx-auto max-w-lg text-balance text-base font-normal leading-relaxed"
               style={{ color: WHITE_55 }}
               aria-describedby={
                 !results.use_live_data ? "results-evaluator-data-footnote" : undefined
               }
             >
-              Average rating given to AI responses, grouped by value profile
+              Frontier AI models are trained on human feedback, but that feedback doesn't represent everyone equally. Here's how reasonableness ratings vary across different value profiles, and where you sit.
               {!results.use_live_data ? "*" : ""}
             </p>
           </div>
@@ -307,7 +306,7 @@ https://makesafeai.org/`
               className="mx-auto mb-4 max-w-lg text-center text-sm leading-snug"
               style={{ color: WHITE_40 }}
             >
-              *Currently based on AI evaluator data, updates with real participant data as more people complete the survey
+              *Currently based on AI evaluator data, updates with real participant data once more people complete the survey
             </p>
           )}
 
@@ -346,12 +345,12 @@ https://makesafeai.org/`
           </div>
 
           {/* Dynamic callout text */}
-          <p 
-            className="text-sm mb-2"
-            style={{ color: WHITE_60 }}
+          <p
+            className="mx-auto mb-2 max-w-lg text-balance text-center text-[15px] font-normal leading-relaxed"
+            style={{ color: WHITE_55 }}
           >
             {chartExpanded 
-              ? "People with more progressive values find AI more reasonable according to our data."
+              ? "We've found people with more progressive values find AI more reasonable."
               : isCentrist
                 ? `You rated AI ${userMeanScore}/5 on average. Your values are broadly centrist, we don't yet have enough participant data to compare you to a specific group.`
                 : `You rated AI ${userMeanScore}/5 on average. The average ${personaProfile.primaryPersona} rates AI ${personaAvgScore}/5, you are ${userMeanScore > personaAvgScore ? 'more' : 'less'} positive about AI than most people with your values.`
