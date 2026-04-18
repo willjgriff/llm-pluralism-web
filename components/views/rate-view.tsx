@@ -105,7 +105,12 @@ export function RateView({
   const selectedRating = localRatings[localIndex] ?? null
   const canSeeResults = ratingsCount >= 6
   const isOnFinalResponse = localIndex >= responses.length - 1
-  const isNextResponseDisabled = (hasNoMoreResponses && isOnFinalResponse) || (isPrefetching && isOnFinalResponse)
+  /** Same guard as `handleNextResponse`: require a score before advancing when this slot is not already past server count. */
+  const needsRatingBeforeNext = selectedRating === null && localIndex >= ratingsCount
+  const isNextResponseDisabled =
+    (hasNoMoreResponses && isOnFinalResponse) ||
+    (isPrefetching && isOnFinalResponse) ||
+    needsRatingBeforeNext
 
   useEffect(() => {
     if (localIndex >= 6) setProgressExpandedLabel(true)
@@ -476,7 +481,7 @@ export function RateView({
                   size="lg"
                   disabled={isNextResponseDisabled}
                   onClick={handleNextResponse}
-                  className="px-8 py-6 text-base font-medium bg-accent text-accent-foreground hover:bg-accent/90 transition-all duration-200 shadow-lg shadow-accent/25 disabled:opacity-40 disabled:shadow-none disabled:cursor-not-allowed"
+                  className="px-8 py-6 text-base font-medium bg-accent text-accent-foreground hover:bg-accent/90 transition-all duration-200 shadow-lg shadow-accent/25 disabled:cursor-not-allowed disabled:bg-accent/45 disabled:text-accent-foreground disabled:opacity-100 disabled:shadow-none disabled:hover:bg-accent/45"
                 >
                   Next Response
                   <CornerDownLeft
@@ -505,7 +510,7 @@ export function RateView({
                 size="lg"
                 disabled={isNextResponseDisabled}
                 onClick={handleNextResponse}
-                className="px-10 py-6 text-base font-medium bg-accent text-accent-foreground hover:bg-accent/90 transition-all duration-200 shadow-lg shadow-accent/25 disabled:opacity-40 disabled:shadow-none disabled:cursor-not-allowed"
+                className="px-10 py-6 text-base font-medium bg-accent text-accent-foreground hover:bg-accent/90 transition-all duration-200 shadow-lg shadow-accent/25 disabled:cursor-not-allowed disabled:bg-accent/45 disabled:text-accent-foreground disabled:opacity-100 disabled:shadow-none disabled:hover:bg-accent/45"
               >
                 Next Response
                 <CornerDownLeft

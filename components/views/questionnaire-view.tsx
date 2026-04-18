@@ -126,7 +126,7 @@ export function QuestionnaireView({
             size="lg"
             disabled={!allAnswered || isSubmitting}
             onClick={handleContinue}
-            className="px-10 py-6 text-base font-medium bg-accent text-accent-foreground hover:bg-accent/90 transition-all duration-200 shadow-lg shadow-accent/25 disabled:opacity-40 disabled:shadow-none disabled:cursor-not-allowed"
+            className="px-10 py-6 text-base font-medium bg-accent text-accent-foreground hover:bg-accent/90 transition-all duration-200 shadow-lg shadow-accent/25 disabled:cursor-not-allowed disabled:bg-accent/45 disabled:text-accent-foreground disabled:opacity-100 disabled:shadow-none disabled:hover:bg-accent/45"
           >
             {isSubmitting ? "Preparing profile..." : "Continue"}
           </Button>
