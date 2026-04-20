@@ -16,7 +16,7 @@ ALLOWED_TRAFFIC_SOURCES = frozenset(
         "slack",
         "github",
         "reddit",
-        "forum",
+        "ea",
         "discord",
         "other",
     }
