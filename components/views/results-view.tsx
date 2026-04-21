@@ -364,10 +364,10 @@ https://makesafeai.org/`
             style={{ color: WHITE_55 }}
           >
             <p>
-              This survey is part of a project exploring pluralistic alignment in frontier AI models. Using a bridging score methodology inspired by Community Notes, we measure whether AI responses are acceptable across ideologically diverse groups, not just on average.
+              This survey is part of a broader project exploring whether frontier AI models respond fairly across different value profiles, not just on average. Using a methodology inspired by Community Notes, we measure how reasonable AI responses seem from genuinely different value perspectives.
             </p>
             <p>
-            So far, no model consistently produces responses that are rated reasonable across opposing value perspectives. All frontier models tested lean progressive, scoring lower from conservative and libertarian perspectives. We're collecting human ratings to test whether both patterns hold with real people.
+              Early findings suggest responses are rated more reasonable by progressive-leaning perspectives than conservative or libertarian ones. We're also testing whether AI personas can reliably represent real human values, with the hope they could be used for alignment evaluation in future.
             </p>
           </div>
           <div className="flex flex-col items-center gap-6">
