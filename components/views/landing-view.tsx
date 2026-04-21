@@ -34,7 +34,7 @@ export function LandingView({ onStart }: LandingViewProps) {
 
         {/* Subheadline */}
         <p className="text-lg sm:text-xl text-[#a0a0a8] font-normal leading-relaxed mb-12 text-pretty">
-          Answer a few questions about your values, rate a few AI responses, and discover how aligned you are with AI. Your ratings help us understand whether AI truly works for everyone.
+        Answer a few questions about your values, rate a few AI responses, and see how well today's AI reflects your worldview. Your ratings help us measure whether AI works for people across different value perspectives, not just on average.
         </p>
 
         {/* Feature bullets */}

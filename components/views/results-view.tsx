@@ -367,8 +367,7 @@ https://makesafeai.org/`
               This survey is part of a project exploring pluralistic alignment in frontier AI models. Using a bridging score methodology inspired by Community Notes, we measure whether AI responses are acceptable across ideologically diverse groups, not just on average.
             </p>
             <p>
-              Our findings so far suggest that people with more progressive values find AI responses more reasonable than those with conservative or libertarian values, a pattern consistent across all frontier models tested. 
-              We're collecting human ratings to validate whether this holds beyond AI evaluators.
+            So far, no model consistently produces responses that are rated reasonable across opposing value perspectives. All frontier models tested lean progressive, scoring lower from conservative and libertarian perspectives. We're collecting human ratings to test whether both patterns hold with real people.
             </p>
           </div>
           <div className="flex flex-col items-center gap-6">
