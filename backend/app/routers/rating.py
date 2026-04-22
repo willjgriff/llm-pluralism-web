@@ -6,6 +6,7 @@ from app.database import get_db
 from app.models.database import Rating, Session
 
 router = APIRouter()
+MAX_REASONING_CHARACTERS = 600
 
 
 class RatingRequest(BaseModel):
@@ -25,6 +26,13 @@ def submit_rating(request: RatingRequest, db: DBSession = Depends(get_db)):
     if request.score < 1 or request.score > 5:
         raise HTTPException(status_code=400, detail="Score must be between 1 and 5")
 
+    normalized_reasoning = request.reasoning.strip() if request.reasoning else None
+    if normalized_reasoning and len(normalized_reasoning) > MAX_REASONING_CHARACTERS:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Reasoning must be {MAX_REASONING_CHARACTERS} characters or fewer",
+        )
+
     existing = db.query(Rating).filter(
         Rating.session_id == request.session_id,
         Rating.question_id == request.question_id,
@@ -33,7 +41,7 @@ def submit_rating(request: RatingRequest, db: DBSession = Depends(get_db)):
 
     if existing:
         existing.score = request.score
-        existing.reasoning = request.reasoning
+        existing.reasoning = normalized_reasoning
         db.commit()
         db.refresh(existing)
         return {"success": True, "rating_id": existing.id}
@@ -43,7 +51,7 @@ def submit_rating(request: RatingRequest, db: DBSession = Depends(get_db)):
         question_id=request.question_id,
         model=request.model,
         score=request.score,
-        reasoning=request.reasoning,
+        reasoning=normalized_reasoning,
     )
     db.add(rating)
     db.commit()

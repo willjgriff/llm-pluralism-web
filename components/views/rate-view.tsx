@@ -85,6 +85,8 @@ export function RateView({
   error,
   onClearError,
 }: RateViewProps) {
+  const FEEDBACK_MAX_CHARACTERS = 600
+
   const [localRatings, setLocalRatings] = useState<Record<number, number>>({})
   const [feedback, setFeedback] = useState("")
   const [localIndex, setLocalIndex] = useState(0)
@@ -457,12 +459,16 @@ export function RateView({
               onChange={(e) => setFeedback(e.target.value)}
               placeholder="Share your reasoning..."
               rows={3}
+              maxLength={FEEDBACK_MAX_CHARACTERS}
               className="w-full rounded-lg p-4 text-sm text-foreground placeholder:text-muted-foreground/50 resize-none focus:outline-none focus:ring-1 transition-all"
               style={{ 
                 backgroundColor: "rgba(255, 255, 255, 0.03)",
                 border: "1px solid rgba(255, 255, 255, 0.1)",
               }}
             />
+            <p className="mt-2 text-right text-xs" style={{ color: "rgba(255, 255, 255, 0.4)" }}>
+              {feedback.length}/{FEEDBACK_MAX_CHARACTERS}
+            </p>
           </div>
           
           {/* Buttons */}

@@ -25,7 +25,7 @@ const questions = [
   "The state should redistribute wealth through taxation, even if this reduces incentives for individual effort.",
   "People who succeed should keep those rewards, equalising outcomes is not the government's role.",
   "A government's first obligation is to its own citizens, even when this means limiting help to people elsewhere.",
-  "National boundaries should not be barriers to human flourishing. People, goods and ideas benefit from moving freely.",
+  "Wealthy countries have a moral obligation to accept significantly more immigrants and refugees than they currently do.",
   "Emerging technologies pose risks that society consistently underestimates, precaution should come before progress.",
   "Technological progress has been humanity's greatest problem-solver, the risks of slowing it down outweigh the risks of moving fast.",
   "Religious values and faith communities should help shape laws and public policy. Society loses something essential without them.",
