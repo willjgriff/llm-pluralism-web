@@ -20,7 +20,7 @@ export const metadata: Metadata = {
     type: 'website',
     images: [
       {
-        url: '/og-image-v2.png',
+        url: '/og-image-v2.png?v=2',
         width: 1200,
         height: 630,
         alt: 'Does AI get you? See how AI reflects your values.',
@@ -31,7 +31,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Does AI get you?',
     description: 'Rate AI responses on contested topics and see how well AI performs for someone with your values.',
-    images: ['/og-image-v2.png'],
+    images: ['/og-image-v2.png?v=2'],
   },
   icons: {
     icon: [
