@@ -6,15 +6,11 @@ For setup instructions see [SETUP.md](SETUP.md)
 
 For live deployment see [makesafeai.org](https://makesafeai.org/?src=github)
 
----
-
 ## Research purpose
 
 The [llm-pluralism](https://github.com/willjgriff/llm-pluralism) evaluation framework measures whether AI model responses are acceptable across genuinely different value perspectives using a panel of ideologically diverse AI personas as raters. A core limitation of that approach is that the personas are prompts applied to a single model, they may not faithfully represent the worldviews they describe.
 
 This platform addresses that limitation by collecting ratings from real human participants for comparing to the AI persona scores. The key empirical question is: do people who hold Libertarian, Collectivist, Nationalist, Globalist, Tech Optimist, Tech Sceptic, Religious or Secularist values rate AI responses in the same direction as the corresponding AI personas? And secondly does the progressive lean finding from the AI evaluation, all frontier models scoring consistently low with the Libertarian persona, hold with real human raters?
-
----
 
 ## Participant flow
 
@@ -27,8 +23,6 @@ This platform addresses that limitation by collecting ratings from real human pa
 **Results** — participants see their average rating of the AI responses, their value profile, and how their ratings compare to other persona groups.
 
 Model identities are never shown during rating, all responses are presented blind.
-
----
 
 ## Persona assignment
 
@@ -54,8 +48,6 @@ The primary persona is assigned based on the axis with the highest absolute scor
 
 A society axis (Religious vs Secularist) is included in the questionnaire for data collection purposes but is treated as secondary in the analysis. The corresponding AI personas produced structurally non-discriminating score distributions across three independent evaluation runs, likely because frontier models avoid taking strong positions on religion. Whether real human religious and secular participants show different discrimination patterns is an open research question this platform will help answer.
 
----
-
 ## Response selection
 
 Each participant receives 6 responses selected from `responses_ordered.json` based on their questionnaire profile.
@@ -75,8 +67,6 @@ When a participant requests more responses, the same process applies while exclu
 
 Bridging scores and standard deviation values are precomputed from the llm-pluralism evaluation pipeline and stored in `responses_ordered.json`.
 
----
-
 ## Validation approach
 
 Human ratings are compared to AI persona scores at the response level. For each response with sufficient human ratings the mean human rating from participants in each persona group is computed and correlated with the corresponding AI persona score.
@@ -86,8 +76,6 @@ A strong positive correlation between human persona group means and AI persona s
 The progressive lean finding from the AI evaluation, that conservative-leaning personas consistently rate all models lower than progressive-leaning personas, is tested by comparing mean ratings across human persona groups. If human Libertarian participants give lower mean ratings than human Collectivist and Globalist participants the finding is validated with real human data.
 
 The live data threshold requires at least 3 non-repeat participants with ratings in each of the 8 persona groups before the results comparison chart switches from AI evaluation data to live human aggregate data.
-
----
 
 ## Data collected per session
 
