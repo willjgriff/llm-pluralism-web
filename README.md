@@ -1,6 +1,6 @@
 # LLM Pluralism Web
 
-A human validation platform for the [llm-pluralism](https://github.com/willjgriff/llm-pluralism) evaluation framework. Participants answer a values questionnaire, rate AI responses on contested topics, and discover which frontier model best aligns with their worldview. Their ratings are used to validate whether AI persona-based evaluation scores correlate with real human value judgements.
+A human validation platform for the [llm-pluralism](https://github.com/willjgriff/llm-pluralism) evaluation framework. Participants answer a values questionnaire, rate AI responses on contested topics, and discover if AI is aligned with their worldview. Their ratings are used to validate whether AI persona-based evaluation scores correlate with real human value judgements.
 
 For setup instructions see [SETUP.md](SETUP.md)
 
@@ -10,7 +10,7 @@ For live deployment see [makesafeai.org](https://makesafeai.org/?src=github)
 
 ## Research purpose
 
-The llm-pluralism evaluation framework measures whether AI model responses are acceptable across genuinely different value perspectives using a panel of ideologically diverse AI personas as raters. A core limitation of that approach is that the personas are prompts applied to a single model, they may not faithfully represent the worldviews they describe.
+The [llm-pluralism](https://github.com/willjgriff/llm-pluralism) evaluation framework measures whether AI model responses are acceptable across genuinely different value perspectives using a panel of ideologically diverse AI personas as raters. A core limitation of that approach is that the personas are prompts applied to a single model, they may not faithfully represent the worldviews they describe.
 
 This platform addresses that limitation by collecting ratings from real human participants for comparing to the AI persona scores. The key empirical question is: do people who hold Libertarian, Collectivist, Nationalist, Globalist, Tech Optimist, Tech Sceptic, Religious or Secularist values rate AI responses in the same direction as the corresponding AI personas?
 
@@ -24,13 +24,13 @@ Secondary research questions include:
 
 ## Participant flow
 
-**Questionnaire** — 8 questions across 4 value axes. Each question is rated 1 (strongly disagree) to 5 (strongly agree).
+**Questionnaire** — 8 questions across 4 value axes in random order. Each question is rated 1 (strongly disagree) to 5 (strongly agree).
 
-**Profile assignment** — axis scores are computed from question pairs and the participant is assigned a primary persona based on their dominant axis. The profile page shows their position on all three axes.
+**Profile assignment** — axis scores are computed from question pairs and the participant is assigned a primary persona based on their dominant axis. The profile page shows their position on all four axes.
 
-**Response rating** — participants rate 6 AI responses on a 1–5 reasonableness scale. Responses are selected using a stratified strategy designed to maximise validation signal. Participants can rate additional responses beyond the initial 6.
+**Response rating** — participants rate 6 or more AI responses on a 1–5 reasonableness scale. Responses are selected using a stratified strategy designed to maximise validation signal.
 
-**Results** — participants see which AI model produced responses they rated most reasonable, their value profile, and how their ratings compare to other persona groups.
+**Results** — participants see their average rating of the AI responses, their value profile, and how their ratings compare to other persona groups.
 
 Model identities are never shown during rating, all responses are presented blind.
 
@@ -66,9 +66,9 @@ A society axis (Religious vs Secularist) is included in the questionnaire for da
 
 Each participant receives 6 responses selected from `responses_ordered.json` based on their questionnaire profile.
 
-**Profile determination** — the participant's 8 questionnaire answers are reduced to four axis scores (economic, identity, technology, society). The dominant axis by absolute score becomes their primary axis. Scores below 2 on all axes are treated as centrist.
+**Profile determination** — the participant's 8 questionnaire answers are reduced to four axis scores (economic, identity, technology, society). The dominant axis by absolute score becomes their primary axis for display purposes. However, for evaluation they will be considered to be in all groups that score 2 or more. Scores below 2 on all axes are treated as centrist.
 
-**For non-centrist participants**, 2 responses are drawn from each of two pre-ranked lists for their primary axis: one ordered by bridging score (responses with highest pluralistic acceptability across personas) and one ordered by discriminativeness (responses where personas disagreed most sharply). The top 6 items from each list are weighted 5, 4, 3, 2, 1, 1 for sampling. The candidate pool expands beyond the top 6 if needed to satisfy the enforcement constraints below. Then 2 more at random are selected.
+**For non-centrist participants**, 2 responses are drawn from each of two pre-ranked lists for their primary axis: one ordered by bridging score (responses with highest pluralistic acceptability across personas) and one ordered by standard deviation (responses where personas disagreed most sharply). The top 6 items from each list are weighted 5, 4, 3, 2, 1, 1 for sampling. The candidate pool expands beyond the top 6 if needed to satisfy the enforcement constraints below. Then 2 more at random are selected.
 
 **For centrist participants**, all responses are drawn from the global pool directly at random.
 
@@ -79,7 +79,7 @@ The selection always enforces:
 
 When a participant requests more responses, the same process applies while excluding already-seen question IDs.
 
-Bridging scores and discriminated (std) values are precomputed from the llm-pluralism evaluation pipeline and stored in `responses_ordered.json`.
+Bridging scores and standard deviation values are precomputed from the llm-pluralism evaluation pipeline and stored in `responses_ordered.json`.
 
 ---
 
@@ -102,4 +102,4 @@ The live data threshold requires at least 3 non-repeat participants with ratings
 - Response ratings (question_id, model, score 1–5, optional reasoning)
 - Repeat session flag (detected via localStorage)
 
-Sessions without any ratings are excluded from participant counts and aggregate analysis. Repeat sessions are stored but excluded from the live data threshold and aggregate comparisons.
+Sessions without any ratings are excluded from participant counts and evaluation. Repeat sessions are stored and are excluded from participant counts and maybe evaluation.
