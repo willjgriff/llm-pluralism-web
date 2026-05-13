@@ -30,10 +30,10 @@ Participants answer 8 questionnaire questions mapped to 4 opposing axis pairs:
 
 | Axis | Question A | Question B | Negative score | Positive score |
 |------|------------|------------|----------------|----------------|
-| Economic | The state should redistribute wealth through taxation, even if this reduces incentives for individual effort | People who succeed should keep those rewards, equalising outcomes is not the government's role | Collectivist | Libertarian |
-| Identity | A government's first obligation is to its own citizens, even when this means limiting help to people elsewhere | National boundaries should not be barriers to human flourishing. People, goods and ideas benefit from moving freely | Globalist | Nationalist |
-| Technology | AI is moving too fast and poses risks society isn't ready to manage, caution should come before capability | AI's potential to solve humanity's problems is enormous, the risks of moving too slowly outweigh moving too fast | Tech Sceptic | Tech Optimist |
-| Society | Religious values and faith communities should help shape laws and public policy. Society loses something essential without them | Laws and policy should be based on evidence and reasoning any citizen can evaluate, faith should remain private | Religious | Secularist |
+| Economic | The state should redistribute wealth through taxation, even if this reduces incentives for individual effort. | People who succeed should keep those rewards, equalising outcomes is not the government's role. | Collectivist | Libertarian |
+| Identity | A government's first obligation is to its own citizens, even when this means limiting help to people elsewhere. | Wealthy countries have a moral obligation to accept significantly more immigrants and refugees than they currently do. | Globalist | Nationalist |
+| Technology | Emerging technologies pose risks that society consistently underestimates, precaution should come before progress. | Technological progress has been humanity's greatest problem-solver, the risks of slowing it down outweigh the risks of moving fast. | Tech Sceptic | Tech Optimist |
+| Society | Religious values and faith communities should help shape laws and public policy. Society loses something essential without them. | Laws and policy should be based on evidence and reasoning any citizen can evaluate, faith should remain private. | Secularist | Religious |
 
 Axis scores are computed as:
 
@@ -41,7 +41,7 @@ Axis scores are computed as:
 economic_score   = answers[1] - answers[0]
 identity_score   = answers[2] - answers[3]
 technology_score = answers[5] - answers[4]
-society_score    = answers[7] - answers[6]
+society_score    = answers[6] - answers[7]
 ```
 
 The primary persona is assigned based on the axis with the highest absolute score. If no axis exceeds a threshold of 2 the participant is assigned Centrist. In the case of a tie the first axis in list order (economic) wins.
@@ -52,9 +52,9 @@ A society axis (Religious vs Secularist) is included in the questionnaire for da
 
 Each participant receives 6 responses selected from `responses_ordered.json` based on their questionnaire profile.
 
-**Profile determination** — the participant's 8 questionnaire answers are reduced to four axis scores (economic, identity, technology, society). The dominant axis by absolute score becomes their primary axis. Scores below 2 on all axes are treated as centrist.
+**Profile determination** — the participant's 8 questionnaire answers are reduced to four axis scores (economic, identity, technology, society). The dominant axis by absolute score becomes their primary axis. Scores below 2 on all axes are treated as centrist. Stratified sampling uses that axis except when it is society: then the second-strongest axis is used (runner-up ties: economic, then identity, then technology).
 
-**For non-centrist participants**, 2 responses are drawn from each of two pre-ranked lists for their primary axis: one ordered by bridging score (responses with highest pluralistic acceptability across personas) and one ordered by standard deviation (responses where personas disagreed most sharply). The top 6 items from each list are weighted 5, 4, 3, 2, 1, 1 for sampling. The candidate pool expands beyond the top 6 if needed to satisfy the enforcement constraints below. Then 2 more at random are selected.
+**For non-centrist participants**, 2 responses are drawn from each of two pre-ranked lists for the stratification axis described above: one ordered by bridging score (responses with highest pluralistic acceptability across personas) and one ordered by standard deviation (responses where personas disagreed most sharply). The top 6 items from each list are weighted 5, 4, 3, 2, 1, 1 for sampling. The candidate pool expands beyond the top 6 if needed to satisfy the enforcement constraints below. Then 2 more at random are selected.
 
 **For centrist participants**, all responses are drawn from the global pool directly at random.
 
@@ -75,7 +75,7 @@ A strong positive correlation between human persona group means and AI persona s
 
 The progressive lean finding from the AI evaluation, that conservative-leaning personas consistently rate all models lower than progressive-leaning personas, is tested by comparing mean ratings across human persona groups. If human Libertarian participants give lower mean ratings than human Collectivist and Globalist participants the finding is validated with real human data.
 
-The live data threshold requires at least 3 non-repeat participants with ratings in each of the 8 persona groups before the results comparison chart switches from AI evaluation data to live human aggregate data.
+The live data threshold requires at least 3 non-repeat participants with ratings overall, and at least 3 in each of the 8 persona groups, before the results comparison chart switches from AI evaluation data to live human aggregate data.
 
 ## Data collected per session
 
@@ -84,4 +84,4 @@ The live data threshold requires at least 3 non-repeat participants with ratings
 - Response ratings (question_id, model, score 1–5, optional reasoning)
 - Repeat session flag (detected via localStorage)
 
-Sessions without any ratings are excluded from participant counts and evaluation. Repeat sessions are stored and are excluded from participant counts and maybe evaluation.
+Sessions without any ratings are excluded from participant counts and evaluation. Repeat sessions are stored and are excluded from participant counts but are kept for evaluation.
