@@ -12,13 +12,7 @@ For live deployment see [makesafeai.org](https://makesafeai.org/?src=github)
 
 The [llm-pluralism](https://github.com/willjgriff/llm-pluralism) evaluation framework measures whether AI model responses are acceptable across genuinely different value perspectives using a panel of ideologically diverse AI personas as raters. A core limitation of that approach is that the personas are prompts applied to a single model, they may not faithfully represent the worldviews they describe.
 
-This platform addresses that limitation by collecting ratings from real human participants for comparing to the AI persona scores. The key empirical question is: do people who hold Libertarian, Collectivist, Nationalist, Globalist, Tech Optimist, Tech Sceptic, Religious or Secularist values rate AI responses in the same direction as the corresponding AI personas?
-
-Secondary research questions include:
-
-- Does the progressive lean finding from the AI evaluation, all frontier models scoring consistently low with the Libertarian persona, hold with real human raters?
-- Do human raters with opposing value profiles disagree on responses in the same direction that opposing AI personas disagree?
-- Are there responses where AI personas predict agreement but human raters diverge, or vice versa?
+This platform addresses that limitation by collecting ratings from real human participants for comparing to the AI persona scores. The key empirical question is: do people who hold Libertarian, Collectivist, Nationalist, Globalist, Tech Optimist, Tech Sceptic, Religious or Secularist values rate AI responses in the same direction as the corresponding AI personas? And secondly does the progressive lean finding from the AI evaluation, all frontier models scoring consistently low with the Libertarian persona, hold with real human raters?
 
 ---
 
@@ -66,7 +60,7 @@ A society axis (Religious vs Secularist) is included in the questionnaire for da
 
 Each participant receives 6 responses selected from `responses_ordered.json` based on their questionnaire profile.
 
-**Profile determination** — the participant's 8 questionnaire answers are reduced to four axis scores (economic, identity, technology, society). The dominant axis by absolute score becomes their primary axis for display purposes. However, for evaluation they will be considered to be in all groups that score 2 or more. Scores below 2 on all axes are treated as centrist.
+**Profile determination** — the participant's 8 questionnaire answers are reduced to four axis scores (economic, identity, technology, society). The dominant axis by absolute score becomes their primary axis. Scores below 2 on all axes are treated as centrist.
 
 **For non-centrist participants**, 2 responses are drawn from each of two pre-ranked lists for their primary axis: one ordered by bridging score (responses with highest pluralistic acceptability across personas) and one ordered by standard deviation (responses where personas disagreed most sharply). The top 6 items from each list are weighted 5, 4, 3, 2, 1, 1 for sampling. The candidate pool expands beyond the top 6 if needed to satisfy the enforcement constraints below. Then 2 more at random are selected.
 
