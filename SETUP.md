@@ -14,6 +14,10 @@ Set the backend URL via:
 - `NEXT_PUBLIC_API_URL=http://localhost:8000`
   (create/update `.env.local` in this project root if needed)
 
+Optional for Prolific participants (results page completion link):
+- `NEXT_PUBLIC_PROLIFIC_COMPLETION_URL=https://app.prolific.com/submissions/complete?cc=YOUR_CODE`
+  (shown when `src=prolific`; defaults to the study completion URL if unset)
+
 ## Backend (FastAPI)
 
 ```bash

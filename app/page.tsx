@@ -185,6 +185,7 @@ export default function Home() {
           <ResultsView
             results={appState.results}
             personaProfile={appState.personaProfile}
+            showProlificCompletion={trafficAttribution.src?.toLowerCase() === "prolific"}
           />
         )}
       </div>
