@@ -31,7 +31,11 @@ Environment variables:
 - Copy `backend/.env.example` to `backend/.env` (or otherwise set `DATABASE_URL` and `FRONTEND_URL`).
 - Optional: `SURVEY_TRUSTED_TOKEN` — if set, links with `?t=<that value>` store `traffic_source=trusted` on the session. Public sources use `?src=` with values allowlisted in `backend/app/traffic_source.py`.
 
-Frontend: toggle stripping from the address bar after capture in `lib/traffic-attribution.ts` via `STRIP_SRC_PARAM_FROM_URL` and `STRIP_T_PARAM_FROM_URL`.
+Prolific study links should include `src=prolific` plus Prolific’s substituted query params, for example:
+
+`https://makesafeai.org/?PROLIFIC_PID=1234&STUDY_ID=1234&SESSION_ID=1234&src=prolific`
+
+Frontend: toggle stripping from the address bar after capture in `lib/traffic-attribution.ts` via `STRIP_SRC_PARAM_FROM_URL` and `STRIP_T_PARAM_FROM_URL` (Prolific params are left in the URL by default).
 
 ## Tests (backend)
 

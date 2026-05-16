@@ -19,7 +19,7 @@ ALLOWED_TRAFFIC_SOURCES = frozenset(
         "reddit-liberal",
         "reddit-sample",
         "ea",
-        "discord",
+        "prolific",
         "other",
     }
 )

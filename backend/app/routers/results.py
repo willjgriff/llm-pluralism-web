@@ -36,6 +36,9 @@ def _session_row_to_export_dict(session: Session) -> dict:
         "society_persona": session.society_persona,
         "questionnaire_answers": session.questionnaire_answers,
         "traffic_source": session.traffic_source,
+        "prolific_pid": session.prolific_pid,
+        "prolific_study_id": session.prolific_study_id,
+        "prolific_session_id": session.prolific_session_id,
     }
 
 

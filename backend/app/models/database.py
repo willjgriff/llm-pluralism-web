@@ -20,6 +20,9 @@ class Session(Base):
     primary_axis = Column(String)
     questionnaire_answers = Column(String)
     traffic_source = Column(String, nullable=True)
+    prolific_pid = Column(String(128), nullable=True)
+    prolific_study_id = Column(String(128), nullable=True)
+    prolific_session_id = Column(String(128), nullable=True)
 
 class Rating(Base):
     __tablename__ = "ratings"

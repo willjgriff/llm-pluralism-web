@@ -9,6 +9,7 @@ from pydantic import BaseModel
 from sqlalchemy.orm import Session as DBSession
 from app.database import get_db
 from app.models.database import Session, Rating
+from app.prolific import normalize_prolific_param
 from app.traffic_source import resolve_traffic_source
 
 router = APIRouter()
@@ -41,6 +42,9 @@ class SessionRequest(BaseModel):
     is_repeat: bool = False
     src: str | None = None
     trusted_token: str | None = None
+    prolific_pid: str | None = None
+    prolific_study_id: str | None = None
+    prolific_session_id: str | None = None
 
 
 def _session_request_fingerprint(request: SessionRequest, client_request: Request) -> str:
@@ -52,6 +56,9 @@ def _session_request_fingerprint(request: SessionRequest, client_request: Reques
         "is_repeat": request.is_repeat,
         "src": request.src,
         "trusted_token": request.trusted_token,
+        "prolific_pid": request.prolific_pid,
+        "prolific_study_id": request.prolific_study_id,
+        "prolific_session_id": request.prolific_session_id,
         "client_host": client_host,
         "user_agent": user_agent,
     }
@@ -370,6 +377,9 @@ def create_session(
         is_repeat=request.is_repeat,
         questionnaire_answers=json.dumps(request.answers),
         traffic_source=traffic_source,
+        prolific_pid=normalize_prolific_param(request.prolific_pid),
+        prolific_study_id=normalize_prolific_param(request.prolific_study_id),
+        prolific_session_id=normalize_prolific_param(request.prolific_session_id),
         **personas,
     )
     db.add(session)
