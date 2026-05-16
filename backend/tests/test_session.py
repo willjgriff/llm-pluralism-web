@@ -111,6 +111,46 @@ def test_unknown_src_stored_as_null(client, db_session):
     assert row.traffic_source is None
 
 
+def test_prolific_params_stored_on_session(client, db_session):
+    response = client.post(
+        "/session",
+        json={
+            "answers": VALID_ANSWERS,
+            "is_repeat": False,
+            "src": "prolific",
+            "prolific_pid": "pid-abc",
+            "prolific_study_id": "study-xyz",
+            "prolific_session_id": "sess-123",
+        },
+    )
+    assert response.status_code == 200
+    session_id = response.json()["session_id"]
+    row = db_session.query(SessionRow).filter(SessionRow.id == session_id).one()
+    assert row.traffic_source == "prolific"
+    assert row.prolific_pid == "pid-abc"
+    assert row.prolific_study_id == "study-xyz"
+    assert row.prolific_session_id == "sess-123"
+
+
+def test_unsubstituted_prolific_template_stored_as_null(client, db_session):
+    response = client.post(
+        "/session",
+        json={
+            "answers": VALID_ANSWERS,
+            "is_repeat": False,
+            "src": "prolific",
+            "prolific_pid": "{{%PROLIFIC_PID%}}",
+            "prolific_study_id": "study-xyz",
+            "prolific_session_id": "sess-123",
+        },
+    )
+    assert response.status_code == 200
+    session_id = response.json()["session_id"]
+    row = db_session.query(SessionRow).filter(SessionRow.id == session_id).one()
+    assert row.prolific_pid is None
+    assert row.prolific_study_id == "study-xyz"
+
+
 def test_trusted_token_stored_when_env_set(client, db_session, monkeypatch):
     monkeypatch.setenv("SURVEY_TRUSTED_TOKEN", "my-shared-secret")
     response = client.post(

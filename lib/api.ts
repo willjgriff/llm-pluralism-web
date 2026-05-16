@@ -10,6 +10,9 @@ export async function createSession(
   const body: Record<string, unknown> = { answers, is_repeat: isRepeat }
   if (traffic?.src !== undefined) body.src = traffic.src
   if (traffic?.trustedToken !== undefined) body.trusted_token = traffic.trustedToken
+  if (traffic?.prolificPid !== undefined) body.prolific_pid = traffic.prolificPid
+  if (traffic?.prolificStudyId !== undefined) body.prolific_study_id = traffic.prolificStudyId
+  if (traffic?.prolificSessionId !== undefined) body.prolific_session_id = traffic.prolificSessionId
   const res = await fetch(`${API_URL}/session`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },

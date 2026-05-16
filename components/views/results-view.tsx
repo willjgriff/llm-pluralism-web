@@ -18,9 +18,14 @@ const WHITE_10 = "rgba(255, 255, 255, 0.1)"
 const WHITE_05 = "rgba(255, 255, 255, 0.05)"
 const WHITE_03 = "rgba(255, 255, 255, 0.03)"
 
+const PROLIFIC_COMPLETION_URL =
+  process.env.NEXT_PUBLIC_PROLIFIC_COMPLETION_URL ??
+  "https://app.prolific.com/submissions/complete?cc=CXYA488U"
+
 interface ResultsViewProps {
   results: Results
   personaProfile: PersonaProfile
+  showProlificCompletion?: boolean
 }
 
 /** Prefix for bar row `id` so `LabelList` content still sees it after Recharts `filterProps` strips `payload` / `type`. */
@@ -75,7 +80,11 @@ function formatShareScore(value: number): string {
   return parseFloat(value.toFixed(2)).toString()
 }
 
-export function ResultsView({ results, personaProfile }: ResultsViewProps) {
+export function ResultsView({
+  results,
+  personaProfile,
+  showProlificCompletion = false,
+}: ResultsViewProps) {
   const [copied, setCopied] = useState(false)
 
   const userMeanScore = results.model_scores.length > 0
@@ -214,6 +223,52 @@ https://makesafeai.org/`
               Your ratings help us build a clearer picture of who AI is actually working for.
             </p>
           </div>
+
+          {showProlificCompletion && (
+            <div
+              className="mx-auto mt-10 max-w-lg rounded-xl p-5 text-center"
+              style={{
+                backgroundColor: "rgba(45, 212, 191, 0.06)",
+                border: "1px solid rgba(45, 212, 191, 0.35)",
+              }}
+            >
+              <p
+                className="text-xs font-medium uppercase tracking-wider"
+                style={{ color: TEAL }}
+              >
+                One last step
+              </p>
+              <h3
+                className="mt-3 text-lg font-semibold tracking-tight sm:text-xl"
+                style={{ color: "rgba(255, 255, 255, 0.95)" }}
+              >
+                Confirm your submission on Prolific
+              </h3>
+              <p
+                className="mt-3 text-sm leading-relaxed"
+                style={{ color: WHITE_55 }}
+              >
+                Click below so Prolific records that you finished. Without this step your
+                submission may not be approved or paid.
+              </p>
+              <a
+                href={PROLIFIC_COMPLETION_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-6 inline-flex items-center justify-center rounded-md px-8 py-3 text-base font-medium transition-all duration-200 shadow-lg hover:opacity-90"
+                style={{
+                  backgroundColor: TEAL,
+                  color: "rgb(8, 8, 16)",
+                  boxShadow: "0 10px 25px rgba(94, 170, 168, 0.25)",
+                }}
+              >
+                Return to Prolific
+              </a>
+              <p className="mt-4 text-xs" style={{ color: WHITE_40 }}>
+                You can review your results on this page before or after clicking.
+              </p>
+            </div>
+          )}
         </section>
 
         {/* Section 2 — Value profile */}

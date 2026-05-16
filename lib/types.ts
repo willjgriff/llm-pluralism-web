@@ -36,10 +36,13 @@ export interface Rating {
   reasoning?: string
 }
 
-/** Optional values captured from `?src=` and `?t=` for traffic attribution. */
+/** Optional values captured from URL query params for traffic and Prolific attribution. */
 export interface TrafficAttribution {
   src?: string
   trustedToken?: string
+  prolificPid?: string
+  prolificStudyId?: string
+  prolificSessionId?: string
 }
 
 export interface SessionResponse {
