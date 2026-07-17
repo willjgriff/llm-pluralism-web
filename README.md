@@ -2,9 +2,9 @@
 
 A human validation platform for the [llm-pluralism](https://github.com/willjgriff/llm-pluralism) evaluation framework. Participants answer a values questionnaire, rate AI responses on contested topics, and discover if AI is aligned with their worldview. Their ratings are used to validate whether AI persona-based evaluation scores correlate with real human value judgements.
 
-For setup instructions see [SETUP.md](SETUP.md)
+For setup instructions see [SETUP.md](SETUP.md).
 
-For live deployment see [makesafeai.org](https://makesafeai.org/?src=github)
+For production deployment see [makesafeai.org](https://makesafeai.org/?src=github) for test deployment see [test.makesafeai.org](https://test.makesafeai.org/?src=github) (completion of the test survey won't disturb the production results so feel free to explore it by entering whatever you want).
 
 ## Research purpose
 
